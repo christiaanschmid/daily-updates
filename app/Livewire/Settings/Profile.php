@@ -3,6 +3,7 @@
 namespace App\Livewire\Settings;
 
 use App\Concerns\ProfileValidationRules;
+use App\Support\Desktop;
 use Flux\Flux;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Auth;
@@ -78,6 +79,11 @@ class Profile extends Component
     public function showDeleteUser(): bool
     {
         $user = Auth::user();
+
+        // Deleting the account needs its password, which the desktop app's user never set.
+        if (Desktop::running()) {
+            return false;
+        }
 
         return ! $user instanceof MustVerifyEmail || $user->hasVerifiedEmail();
     }

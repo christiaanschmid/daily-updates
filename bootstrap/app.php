@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\SignInDesktopUser;
+use Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -12,7 +14,15 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->web(append: [
+            SignInDesktopUser::class,
+        ]);
+
+        // Sign the desktop user in before the auth middleware checks for a login.
+        $middleware->prependToPriorityList(
+            before: AuthenticatesRequests::class,
+            prepend: SignInDesktopUser::class,
+        );
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

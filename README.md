@@ -2,7 +2,9 @@
 
 A small app for keeping a log of your workday and sharing it at the next morning's huddle.
 
-Write down what you get done as the day goes, keep a running todo list beside it, and the next morning open the **Huddle** page to see (and copy) yesterday's log, ready to read out or paste into chat.
+Write down what you get done as the day goes, keep a running todo list at the top of it, and the next morning open the **Huddle** page to see (and copy) yesterday's log, ready to read out or paste into chat.
+
+![Today's log in Daily Updates, with open todos, the Done section and completed todos](docs/screenshot.png)
 
 ## Features
 

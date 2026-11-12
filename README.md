@@ -85,7 +85,21 @@ The desktop app keeps its data apart from the browser version:
 - **While developing:** `database/nativephp.sqlite`
 - **The built app:** `~/Library/Application Support/daily-updates/database/database.sqlite`
 
+### Installing and updating the app
+
+```bash
+composer desktop:install
+```
+
+This builds the app from this folder, quits the installed copy if it's open, replaces `/Applications/Daily Updates.app`, and opens the new one. Run it again whenever you want the installed app to pick up your changes. It builds whatever is in the folder, including changes you haven't committed.
+
+Each build gets a new version made from the date and time, such as `2026.11.121105`. The app runs any new database migrations when its version changes, so you never need to set the version yourself. Your data lives in `~/Library/Application Support/daily-updates/`, outside the app, so it's kept when the app is replaced.
+
+The app has no automatic updates: NativePHP's updater is turned off in `config/nativephp.php`, because it needs a signed app published somewhere to update from.
+
 ### Building the app
+
+To build without installing:
 
 ```bash
 php artisan native:build mac arm64

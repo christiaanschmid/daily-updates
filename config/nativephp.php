@@ -107,8 +107,11 @@ return [
          * Whether or not the updater is enabled. Please note that the
          * updater will only work when your application is bundled
          * for production.
+         *
+         * Off: this app isn't published anywhere to update from. Install a
+         * new build with `composer desktop:install` instead.
          */
-        'enabled' => env('NATIVEPHP_UPDATER_ENABLED', true),
+        'enabled' => env('NATIVEPHP_UPDATER_ENABLED', false),
 
         /**
          * Whether an available update is downloaded automatically. Set this

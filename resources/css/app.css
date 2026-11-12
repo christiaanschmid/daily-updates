@@ -1,0 +1,99 @@
+@import 'tailwindcss';
+@import '../../vendor/livewire/flux/dist/flux.css';
+
+@source '../views';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../vendor/livewire/flux/stubs/**/*.blade.php';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    /* "Midnight": Flux draws on the zinc scale, so a navy-tinted zinc restyles every Flux component. */
+    --color-zinc-50: #f5f7fb;
+    --color-zinc-100: #e6e9f2;
+    --color-zinc-200: #c9cfdd;
+    --color-zinc-300: #aeb6c9;
+    --color-zinc-400: #9aa3b8;
+    --color-zinc-500: #7c869c;
+    --color-zinc-600: #4a5574;
+    --color-zinc-700: #26304a;
+    --color-zinc-800: #131a2b;
+    --color-zinc-900: #0f1424;
+    --color-zinc-950: #0b0f1a;
+
+    /* Section colors for an update. */
+    --color-section-done: #aeb6c9;
+    --color-section-up-next: #b9c6ff;
+
+    --color-accent: #8ea2ff;
+    --color-accent-content: #b9c6ff;
+    --color-accent-foreground: #0b0f1a;
+}
+
+@layer theme {
+    .dark {
+        --color-accent: #8ea2ff;
+        --color-accent-content: #b9c6ff;
+        --color-accent-foreground: #0b0f1a;
+    }
+}
+
+@layer base {
+
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentColor);
+    }
+}
+
+[data-flux-field]:not(ui-radio, ui-checkbox) {
+    @apply grid gap-2;
+}
+
+[data-flux-label] {
+    @apply  !mb-0 !leading-tight;
+}
+
+input:focus[data-flux-control],
+textarea:focus[data-flux-control],
+select:focus[data-flux-control] {
+    @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
+}
+
+/* \[:where(&)\]:size-4 {
+    @apply size-4;
+} */
+
+/* Day view editors read as a document: no chrome until a section is being edited. */
+.du-editor {
+    @apply rounded-xl border border-transparent bg-transparent transition-colors;
+}
+
+.du-editor:hover {
+    @apply border-zinc-800;
+}
+
+.du-editor:focus-within {
+    @apply border-[#2c3a66] bg-zinc-900;
+}
+
+.du-editor-content {
+    @apply min-h-24 px-4 py-3 text-base leading-relaxed text-zinc-100 outline-none;
+}
+
+.du-editor-content li > ul,
+.du-editor-content li > ol {
+    @apply my-1;
+}
+
+/* Saved update HTML, shown outside the editor. */
+.du-prose {
+    @apply [&_a]:text-accent-content [&_a]:underline [&_blockquote]:border-s-2 [&_blockquote]:border-zinc-700 [&_blockquote]:ps-3 [&_code]:rounded [&_code]:bg-white/10 [&_code]:px-1 [&_code]:font-mono [&_code]:text-[0.9em] [&_li]:my-0.5 [&_li>p]:my-0 [&_ol]:list-decimal [&_ol]:ps-5 [&_p]:my-1 [&_ul]:list-disc [&_ul]:ps-5 [&_ul_ul]:list-[circle] [&_ul_ul_ul]:list-[square] [&_li]:marker:text-zinc-500;
+}

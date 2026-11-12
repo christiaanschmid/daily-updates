@@ -52,9 +52,25 @@ Open the URL it prints (by default http://localhost:8000), register an account, 
 
 Daily Updates also runs as a Mac app, built with [NativePHP](https://nativephp.com/docs/desktop). It's the same app in its own window, with no server to run and no login: it signs you in automatically as its one local user.
 
-### Running it
+### Installing the app
 
-After `composer setup`, run these once:
+After `composer setup`, build the app and install it in `/Applications`:
+
+```bash
+composer desktop:install
+```
+
+The first build downloads a lot and takes several minutes. When it's done, Daily Updates opens, and from then on you can open it like any other app, without running anything here.
+
+To get later changes into the installed app, for example after a `git pull`, run `composer desktop:install` again. It builds whatever is in this folder, including changes you haven't committed, quits the installed copy if it's open, replaces it and opens the new one.
+
+Each build gets a new version made from the date and time, such as `2026.11.121105`. The app runs any new database migrations when its version changes, so you never need to set the version yourself. Your data lives in `~/Library/Application Support/daily-updates/`, outside the app, so it's kept when the app is replaced.
+
+The app has no automatic updates: NativePHP's updater is turned off in `config/nativephp.php`, because it needs a signed app published somewhere to update from.
+
+### Developing with the desktop app
+
+To work on the app in its desktop window, run these once after `composer setup`:
 
 ```bash
 php artisan native:install --no-interaction
@@ -68,7 +84,7 @@ node vendor/nativephp/desktop/resources/electron/node_modules/electron/install.j
 php artisan native:migrate
 ```
 
-The first installs NativePHP's Electron shell and a PHP binary for the app. The second downloads Electron itself: NativePHP looks for Electron before starting it, and Electron 45 no longer downloads itself when installed, so this step is needed on every fresh clone. The third creates the desktop app's database.
+The first installs NativePHP's Electron shell and a PHP binary for the app. The second downloads Electron itself: NativePHP looks for Electron before starting it, and Electron 45 no longer downloads itself when installed, so this step is needed on every fresh clone. The third creates the development database.
 
 Then start the app:
 
@@ -82,20 +98,8 @@ This opens the app in its own window and runs Vite, so front-end changes reload 
 
 The desktop app keeps its data apart from the browser version:
 
+- **The installed app:** `~/Library/Application Support/daily-updates/database/database.sqlite`
 - **While developing:** `database/nativephp.sqlite`
-- **The built app:** `~/Library/Application Support/daily-updates/database/database.sqlite`
-
-### Installing and updating the app
-
-```bash
-composer desktop:install
-```
-
-This builds the app from this folder, quits the installed copy if it's open, replaces `/Applications/Daily Updates.app`, and opens the new one. Run it again whenever you want the installed app to pick up your changes. It builds whatever is in the folder, including changes you haven't committed.
-
-Each build gets a new version made from the date and time, such as `2026.11.121105`. The app runs any new database migrations when its version changes, so you never need to set the version yourself. Your data lives in `~/Library/Application Support/daily-updates/`, outside the app, so it's kept when the app is replaced.
-
-The app has no automatic updates: NativePHP's updater is turned off in `config/nativephp.php`, because it needs a signed app published somewhere to update from.
 
 ### Building the app
 
@@ -107,7 +111,7 @@ php artisan native:build mac arm64
 
 Use `x64` instead of `arm64` for Intel Macs. The build runs `npm run build` first, then writes `Daily Updates.app`, a `.dmg` and a `.zip` to `nativephp/electron/dist/`.
 
-The build is not code signed, so it opens on the Mac that built it, but other Macs will say the app is damaged. To share it, you need an [Apple Developer Program](https://developer.apple.com/programs/) membership and these settings in `.env` when you build: `NATIVEPHP_APPLE_ID`, `NATIVEPHP_APPLE_ID_PASS` (an app-specific password) and `NATIVEPHP_APPLE_TEAM_ID`. See NativePHP's [building guide](https://nativephp.com/docs/desktop/2/publishing/building).
+The build is not code signed, so it opens on the Mac that built it, but other Macs will say the app is damaged. The easiest way to share it is to have the other person clone this repository and run `composer desktop:install` on their own Mac. To share a build directly, you need an [Apple Developer Program](https://developer.apple.com/programs/) membership and these settings in `.env` when you build: `NATIVEPHP_APPLE_ID`, `NATIVEPHP_APPLE_ID_PASS` (an app-specific password) and `NATIVEPHP_APPLE_TEAM_ID`. See NativePHP's [building guide](https://nativephp.com/docs/desktop/2/publishing/building).
 
 Your `.env` file is copied into the app, where anyone who has it can read it, so keep secrets out of it. NativePHP removes a few known keys, listed under `cleanup_env_keys` in `config/nativephp.php`.
 

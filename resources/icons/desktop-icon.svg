@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <!--
+    The web icon (public/favicon.svg) fitted to the macOS app icon grid: the
+    rounded square is 824px inside a 1024px canvas, leaving a transparent margin
+    so the icon matches the size of other apps in the Dock.
+    Render to public/icon.png and public/icon.icns with resources/icons/render-desktop-icon.sh
+  -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2e2e2e"/>
+      <stop offset="1" stop-color="#121212"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(100 100) scale(0.8046875)">
+    <rect width="1024" height="1024" rx="228" fill="url(#bg)"/>
+    <circle cx="262" cy="322" r="46" fill="#f59e0b"/>
+    <rect x="356" y="290" width="438" height="64" rx="32" fill="#fafafa"/>
+    <circle cx="392" cy="512" r="34" fill="none" stroke="#d4d4d4" stroke-width="22"/>
+    <rect x="472" y="484" width="322" height="56" rx="28" fill="#d4d4d4"/>
+    <circle cx="262" cy="702" r="46" fill="#fafafa"/>
+    <rect x="356" y="670" width="378" height="64" rx="32" fill="#fafafa"/>
+  </g>
+</svg>

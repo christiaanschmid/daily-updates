@@ -15,7 +15,7 @@
     <flux:input
         wire:model.live.debounce.300ms="search"
         icon="magnifying-glass"
-        :placeholder="__('Search your updates, e.g. ABC-102')"
+        :placeholder="__('Search your updates')"
         :aria-label="__('Search updates')"
         clearable
         class="[&_input]:rounded-full! [&_input]:bg-zinc-900! [&_input]:border-[#1f2840]!"

@@ -3,6 +3,7 @@
         <flux:navlist aria-label="{{ __('Settings') }}">
             <flux:navlist.item :href="route('profile.edit')" wire:navigate>{{ __('Profile') }}</flux:navlist.item>
             @unlessdesktop
+                <flux:navlist.item :href="route('plan.edit')" wire:navigate>{{ __('Plan') }}</flux:navlist.item>
                 <flux:navlist.item :href="route('security.edit')" wire:navigate>{{ __('Security') }}</flux:navlist.item>
             @enddesktop
             <flux:navlist.item :href="route('appearance.edit')" wire:navigate>{{ __('Appearance') }}</flux:navlist.item>

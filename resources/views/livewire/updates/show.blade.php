@@ -80,6 +80,7 @@
                     {{ __('The free plan shows and writes logs for your last :days days. Upgrade to the cloud plan to log any day.', ['days' => \App\Models\User::FREE_HISTORY_DAYS]) }}
                 @endif
             </p>
+            <a href="{{ route('plan.edit') }}" class="mt-4 inline-flex text-sm font-semibold text-accent-content hover:underline" wire:navigate>{{ __('See the cloud plan') }}</a>
         </div>
     @else
     @if ($day->isToday())

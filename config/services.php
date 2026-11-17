@@ -18,6 +18,18 @@ return [
         'key' => env('POSTMARK_API_KEY'),
     ],
 
+    // The cloud plan's prices in Paddle. Both have a free trial, set on the price in Paddle.
+    'paddle' => [
+        'prices' => [
+            'monthly' => env('PADDLE_PRICE_MONTHLY'),
+            'yearly' => env('PADDLE_PRICE_YEARLY'),
+        ],
+
+        // Shown on the Plan page. It must match the trial set on both prices in
+        // Paddle, which is what actually decides when people are charged.
+        'trial_days' => 30,
+    ],
+
     'resend' => [
         'key' => env('RESEND_API_KEY'),
     ],

@@ -84,6 +84,7 @@
                 $this->hiddenUpdatesCount,
                 ['days' => \App\Models\User::FREE_HISTORY_DAYS],
             ) }}
+            <a href="{{ route('plan.edit') }}" class="font-semibold text-accent-content hover:underline" wire:navigate>{{ __('See the cloud plan') }}</a>
         </p>
     @endif
 </section>

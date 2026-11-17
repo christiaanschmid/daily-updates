@@ -86,13 +86,24 @@ The web version can be hosted on [Laravel Cloud](https://cloud.laravel.com) with
 
 On the web, a free account sees and writes logs for its last 14 days. Older logs are kept, and show again on the cloud plan, which has the full history. The desktop app has no limit, because everything stays on your Mac.
 
-Until subscriptions are added, you give an account the cloud plan by hand. In Laravel Cloud, go to the environment's **Commands** tab, click **Open console** and run:
+People subscribe under **Settings → Plan**, for $5 a month or $50 a year with a 30-day free trial. Payments go through [Paddle](https://www.paddle.com), using [Laravel Cashier Paddle](https://laravel.com/docs/cashier-paddle). Canceling keeps the cloud plan until the end of the trial or the period already paid for. If a payment fails, the account works like the free plan until the payment method is updated.
+
+You can also give an account the cloud plan without a subscription, for example your own. In Laravel Cloud, go to the environment's **Commands** tab, click **Open console** and run:
 
 ```bash
 php artisan cloud-plan:grant someone@example.com
 ```
 
 Add `--revoke` to take it away again.
+
+### Setting up Paddle
+
+Do this in your Paddle sandbox first, then again in your live account. They're separate, with their own keys, prices and settings.
+
+1. **Product and prices.** Under **Catalog → Products**, create one product with two prices: $5.00 a month and $50.00 a year, each with a 30-day free trial. The trial is set on the price, so it's Paddle, not this app, that decides when people are charged. If you change its length, change `trial_days` in `config/services.php` too, which is only the text on the Plan page.
+2. **Default payment link.** Under **Checkout → Checkout configuration**, set the default payment link to `https://your-domain/pay`. Paddle won't open any checkout until this is set, and it sends people there to update their payment method.
+3. **Webhooks.** Under **Events → Notifications**, add a destination for `https://your-domain/paddle/webhook` with these events: `customer.updated`, `transaction.completed`, `transaction.updated`, `subscription.created`, `subscription.updated`, `subscription.paused` and `subscription.canceled`. Copy its secret key into `PADDLE_WEBHOOK_SECRET`. Without a secret, the app refuses every webhook, because it can't tell Paddle's apart from forged ones.
+4. **Environment variables** (in Laravel Cloud, or `.env` locally): `PADDLE_SANDBOX`, `PADDLE_CLIENT_SIDE_TOKEN`, `PADDLE_API_KEY`, `PADDLE_WEBHOOK_SECRET`, `PADDLE_PRICE_MONTHLY` and `PADDLE_PRICE_YEARLY`. `.env.example` says where each one comes from. Set `PADDLE_SANDBOX=false` only with your live account's values.
 
 The app has no queued jobs or scheduled tasks, so it doesn't need a queue worker or the scheduler. The desktop app isn't affected by any of this: it always uses its own SQLite database on your Mac.
 

@@ -17,6 +17,7 @@ use Illuminate\Support\Str;
 use Laravel\Fortify\Contracts\PasskeyUser;
 use Laravel\Fortify\PasskeyAuthenticatable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Laravel\Paddle\Billable;
 
 /**
  * @property int $id
@@ -38,7 +39,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable;
+    use Billable, HasFactory, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable;
 
     /**
      * How many days of logs, today included, a free web account can see.
@@ -92,11 +93,13 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
     }
 
     /**
-     * Whether this account has the cloud plan, with its full history.
+     * Whether this account has the cloud plan, with its full history: a Paddle
+     * subscription that is active, in its trial, or canceled but not yet ended,
+     * or the plan given by hand with cloud-plan:grant.
      */
     public function hasCloudPlan(): bool
     {
-        return $this->cloud_plan_granted;
+        return $this->cloud_plan_granted || $this->subscribed();
     }
 
     /**

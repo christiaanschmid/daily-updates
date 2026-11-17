@@ -160,6 +160,20 @@ The desktop app keeps its data apart from the browser version:
 - **The installed app:** `~/Library/Application Support/daily-updates/database/database.sqlite`
 - **While developing:** `database/nativephp.sqlite`
 
+### Moving to the cloud
+
+The desktop app is free and keeps everything on your Mac. To use your logs on other devices too, go to **Settings → Plan** in the app and click **Move to cloud**. It needs an account on the hosted site with the cloud plan.
+
+1. The app opens your browser to a page on the hosted site. Sign in there and click **Connect my Mac**.
+2. The app uploads its logs and todos. A day that already has a log in the cloud keeps it, with the Mac's notes added below. Todos that are already there aren't added again.
+3. The app's window signs in to your cloud account, and from then on opens it instead of the local logs.
+
+Your local logs stay on the Mac. To go back to them, choose **Cloud → Use This Mac's Data Instead** from the menu bar, which relaunches the app on its own data. Anything written in the cloud in the meantime stays in the cloud.
+
+The app connects to `https://dailyupdates.app`. To try it against another copy, such as your local one, set `DAILY_UPDATES_CLOUD_URL` in `.env` before building or running the app.
+
+How it's kept safe: the app makes up a secret that never leaves it, except to the hosted site's API, and every upload must prove it. The approval link in the browser only carries a public code, so it can't upload or sign anyone in by itself. Connections expire after 15 minutes if not approved, and the sign-in link for the app's window works once, within 5 minutes.
+
 ### Building the app
 
 To build without installing:

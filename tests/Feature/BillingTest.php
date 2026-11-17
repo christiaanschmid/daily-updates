@@ -267,10 +267,15 @@ test('the plan page waits for Paddle after checkout', function () {
         ->assertSeeHtml('data-test="plan-finishing"');
 });
 
-test('the desktop app has no plan page', function () {
+test('the desktop app\'s plan page offers moving to the cloud instead of billing', function () {
     config(['nativephp-internal.running' => true]);
 
-    $this->get(route('plan.edit'))->assertNotFound();
+    $this->get(route('plan.edit'))
+        ->assertOk()
+        ->assertSee('data-test="move-start"', false)
+        ->assertDontSee('data-test="plan-free"', false);
+
+    Livewire::test(Plan::class)->call('subscribe', 'monthly')->assertNotFound();
 });
 
 test('the payment link page opens Paddle\'s checkout for a transaction', function () {

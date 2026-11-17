@@ -30,6 +30,11 @@ return [
         'trial_days' => 30,
     ],
 
+    // The hosted Daily Updates that the Mac app's "Move to cloud" connects to.
+    'cloud' => [
+        'url' => env('DAILY_UPDATES_CLOUD_URL', 'https://dailyupdates.app'),
+    ],
+
     'resend' => [
         'key' => env('RESEND_API_KEY'),
     ],

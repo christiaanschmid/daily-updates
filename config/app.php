@@ -67,6 +67,10 @@ return [
 
     'timezone' => env('APP_TIMEZONE', 'UTC'),
 
+    // The timezone for users who haven't chosen one. "timezone" above is
+    // switched to the signed-in user's own for each request.
+    'default_timezone' => env('APP_TIMEZONE', 'UTC'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Locale Configuration

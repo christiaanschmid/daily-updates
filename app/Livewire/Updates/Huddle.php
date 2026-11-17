@@ -22,7 +22,7 @@ class Huddle extends Component
     #[Computed]
     public function update(): ?DailyUpdate
     {
-        return Auth::user()->dailyUpdates()
+        return Auth::user()->visibleUpdates()
             ->whereDate('date', '<', today())
             ->latest('date')
             ->first();

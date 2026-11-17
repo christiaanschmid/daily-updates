@@ -16,6 +16,7 @@ use Livewire\Component;
  * @property-read DailyUpdate|null $previousUpdate
  * @property-read DailyUpdate|null $nextUpdate
  * @property-read bool $hasCompletedTodos
+ * @property-read bool $locked
  */
 class Show extends Component
 {
@@ -56,6 +57,10 @@ class Show extends Component
         $this->date = $date;
         $this->selectedDate = $date;
 
+        if ($this->locked) {
+            return;
+        }
+
         if ($this->update) {
             $this->fillFromUpdate();
 
@@ -92,7 +97,9 @@ class Show extends Component
             return;
         }
 
-        if (! $this->startedHere || Auth::user()->dailyUpdates()->whereDate('date', $date)->exists()) {
+        $moveTo = Carbon::createFromFormat('!Y-m-d', $date);
+
+        if (! $this->startedHere || ! Auth::user()->canSeeDay($moveTo) || Auth::user()->dailyUpdates()->whereDate('date', $date)->exists()) {
             $this->redirectRoute('updates.show', $date, navigate: true);
 
             return;
@@ -130,6 +137,8 @@ class Show extends Component
      */
     public function edit(): void
     {
+        abort_if($this->locked, 403);
+
         foreach (array_keys(DailyUpdate::SECTIONS) as $section) {
             if (blank(strip_tags($this->{$section}))) {
                 $this->{$section} = self::EMPTY_BULLET_LIST;
@@ -144,6 +153,8 @@ class Show extends Component
      */
     public function delete(): void
     {
+        abort_if($this->locked, 403);
+
         $this->update?->delete();
 
         Flux::toast(text: __('Update deleted.'));
@@ -166,7 +177,7 @@ class Show extends Component
     #[Computed]
     public function previousUpdate(): ?DailyUpdate
     {
-        return Auth::user()->dailyUpdates()
+        return Auth::user()->visibleUpdates()
             ->whereDate('date', '<', $this->day())
             ->latest('date')
             ->first();
@@ -178,7 +189,7 @@ class Show extends Component
     #[Computed]
     public function nextUpdate(): ?DailyUpdate
     {
-        return Auth::user()->dailyUpdates()
+        return Auth::user()->visibleUpdates()
             ->whereDate('date', '>', $this->day())
             ->oldest('date')
             ->first();
@@ -193,6 +204,15 @@ class Show extends Component
         return Auth::user()->todos()->completedOn($this->day())->exists();
     }
 
+    /**
+     * Whether this day is older than a free web account can see.
+     */
+    #[Computed]
+    public function locked(): bool
+    {
+        return ! Auth::user()->canSeeDay($this->day());
+    }
+
     public function render(): View
     {
         return view('livewire.updates.show')
@@ -205,6 +225,8 @@ class Show extends Component
      */
     protected function persist(): void
     {
+        abort_if($this->locked, 403);
+
         $validated = $this->validate([
             'done' => ['nullable', 'string', 'max:'.DailyUpdate::MAX_SECTION_LENGTH],
             'up_next' => ['nullable', 'string', 'max:'.DailyUpdate::MAX_SECTION_LENGTH],

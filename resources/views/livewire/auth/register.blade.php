@@ -7,6 +7,10 @@
 
         <form method="POST" action="{{ route('register.store') }}" class="flex flex-col gap-6">
             @csrf
+            <!-- The browser's timezone, so "today" starts at the user's own midnight -->
+            <input type="hidden" name="timezone" value="">
+            <script>document.currentScript.previousElementSibling.value = Intl.DateTimeFormat().resolvedOptions().timeZone;</script>
+
             <!-- Name -->
             <flux:input
                 name="name"

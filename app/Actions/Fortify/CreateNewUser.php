@@ -24,9 +24,13 @@ class CreateNewUser implements CreatesNewUsers
             'password' => $this->passwordRules(),
         ])->validate();
 
+        $timezone = $input['timezone'] ?? null;
+
         return User::create([
             'name' => $input['name'],
             'email' => $input['email'],
+            // Sent by the browser; anything that isn't a real timezone falls back to the default.
+            'timezone' => in_array($timezone, timezone_identifiers_list(), true) ? $timezone : null,
             'password' => $input['password'],
         ]);
     }

@@ -12,7 +12,7 @@ test('guests are redirected to the login page', function () {
 });
 
 test('a new update starts in edit mode, without the previous plan while up next is hidden', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->cloudPlan()->create();
     DailyUpdate::factory()->for($user)->create(['date' => '2026-10-21', 'up_next' => '<ul><li><p>Older plan</p></li></ul>']);
     DailyUpdate::factory()->for($user)->create(['date' => '2026-10-23', 'up_next' => '<ul><li><p>Product page redesign</p></li></ul>']);
 
@@ -27,7 +27,7 @@ test('a new update starts in edit mode, without the previous plan while up next 
 });
 
 test('an update can be saved for a day', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->cloudPlan()->create();
 
     $this->actingAs($user);
 
@@ -47,7 +47,7 @@ test('an update can be saved for a day', function () {
 });
 
 test('typing in a section saves it without leaving edit mode', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->cloudPlan()->create();
 
     $this->actingAs($user);
 
@@ -64,7 +64,7 @@ test('typing in a section saves it without leaving edit mode', function () {
 });
 
 test('opening a new day without writing anything saves nothing', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->cloudPlan()->create());
 
     Livewire::test(Show::class, ['date' => '2026-10-26'])
         ->set('done', Show::EMPTY_BULLET_LIST)
@@ -75,7 +75,7 @@ test('opening a new day without writing anything saves nothing', function () {
 });
 
 test('an autosaved new update moves along when its date is changed', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->cloudPlan()->create();
 
     $this->actingAs($user);
 
@@ -92,7 +92,7 @@ test('an autosaved new update moves along when its date is changed', function ()
 });
 
 test('saving an existing update changes it instead of adding another', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->cloudPlan()->create();
     DailyUpdate::factory()->for($user)->create(['date' => '2026-10-26', 'done' => null]);
 
     $this->actingAs($user);
@@ -109,7 +109,7 @@ test('saving an existing update changes it instead of adding another', function 
 });
 
 test('a new update can be moved to another day before it is saved', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->cloudPlan()->create();
 
     $this->actingAs($user);
 
@@ -126,7 +126,7 @@ test('a new update can be moved to another day before it is saved', function () 
 });
 
 test('picking a day that already has an update opens it', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->cloudPlan()->create();
     DailyUpdate::factory()->for($user)->create(['date' => '2026-10-22']);
 
     $this->actingAs($user);
@@ -138,7 +138,7 @@ test('picking a day that already has an update opens it', function () {
 });
 
 test('picking a day from a saved update opens that day', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->cloudPlan()->create();
     DailyUpdate::factory()->for($user)->create(['date' => '2026-10-26']);
 
     $this->actingAs($user);
@@ -151,7 +151,7 @@ test('picking a day from a saved update opens that day', function () {
 });
 
 test('picking an impossible day is ignored', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->cloudPlan()->create());
 
     Livewire::test(Show::class, ['date' => '2026-10-26'])
         ->set('selectedDate', '2026-02-30')
@@ -161,7 +161,7 @@ test('picking an impossible day is ignored', function () {
 });
 
 test('sections longer than the limit are rejected', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->cloudPlan()->create());
 
     Livewire::test(Show::class, ['date' => '2026-10-26'])
         ->set('up_next', str_repeat('a', DailyUpdate::MAX_SECTION_LENGTH + 1))
@@ -172,7 +172,7 @@ test('sections longer than the limit are rejected', function () {
 });
 
 test('an update can be deleted', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->cloudPlan()->create();
     DailyUpdate::factory()->for($user)->create(['date' => '2026-10-26']);
 
     $this->actingAs($user);
@@ -187,7 +187,7 @@ test('an update can be deleted', function () {
 test('a user never sees another user\'s update', function () {
     DailyUpdate::factory()->create(['date' => '2026-10-26', 'done' => '<p>Someone else\'s plan</p>']);
 
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->cloudPlan()->create());
 
     Livewire::test(Show::class, ['date' => '2026-10-26'])
         ->assertSet('editing', true)
@@ -198,13 +198,13 @@ test('a user never sees another user\'s update', function () {
 });
 
 test('dates that do not exist return not found', function (string $date) {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->cloudPlan()->create());
 
     $this->get('/updates/'.$date)->assertNotFound();
 })->with(['2026-02-30', '2026-13-01', 'today']);
 
 test('empty bullets are removed when an update is saved', function (string $html, ?string $expected) {
-    $user = User::factory()->create();
+    $user = User::factory()->cloudPlan()->create();
 
     $this->actingAs($user);
 
@@ -243,7 +243,7 @@ test('empty bullets are removed when an update is saved', function (string $html
 ]);
 
 test('unsafe markup is removed before an update is stored', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->cloudPlan()->create();
 
     $this->actingAs($user);
 
@@ -265,7 +265,7 @@ test('unsafe markup is removed before an update is stored', function () {
 });
 
 test('the page title shows the saved update\'s date, or today for a new update', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->cloudPlan()->create();
     DailyUpdate::factory()->for($user)->create(['date' => '2026-10-22']);
 
     $this->actingAs($user);
@@ -279,7 +279,7 @@ test('the page title shows the saved update\'s date, or today for a new update',
 });
 
 test('the history lists updates newest first and can be searched', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->cloudPlan()->create();
     DailyUpdate::factory()->for($user)->create(['date' => '2026-10-22', 'done' => '<p>Fixed OPS-301</p>']);
     DailyUpdate::factory()->for($user)->create(['date' => '2026-10-23', 'done' => '<p>Finished up ABC-102</p>']);
 
@@ -293,7 +293,7 @@ test('the history lists updates newest first and can be searched', function () {
 });
 
 test('history search ignores upper and lower case', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->cloudPlan()->create();
     DailyUpdate::factory()->for($user)->create(['date' => '2026-10-22', 'done' => '<p>Fixed OPS-301</p>']);
     DailyUpdate::factory()->for($user)->create(['date' => '2026-10-23', 'done' => '<p>Reviewed the deploy plan</p>']);
     DailyUpdate::factory()->for($user)->create(['date' => '2026-10-26', 'done' => '<p>Finished up ABC-102</p>']);
@@ -311,7 +311,7 @@ test('history search ignores upper and lower case', function () {
 });
 
 test('search matches are highlighted in the history', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->cloudPlan()->create();
     DailyUpdate::factory()->for($user)->create(['date' => '2026-10-22', 'done' => '<ul><li><p>Fixed OPS-301 issue</p></li></ul>']);
 
     $this->actingAs($user);
@@ -375,7 +375,7 @@ test('the huddle copy uses the huddle headings', function () {
 });
 
 test('the huddle shares the log of the most recent workday before today', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->cloudPlan()->create();
     DailyUpdate::factory()->for($user)->create(['date' => '2026-10-22', 'done' => '<p>Thursday work</p>']);
     DailyUpdate::factory()->for($user)->create(['date' => '2026-10-23', 'done' => '<p>Fixed OPS-301</p>', 'up_next' => '<p>Product page redesign</p>']);
     DailyUpdate::factory()->for($user)->create(['date' => '2026-10-26', 'done' => '<p>Monday work</p>']);
@@ -394,7 +394,7 @@ test('the huddle shares the log of the most recent workday before today', functi
 test('the huddle says when there is nothing to share yet', function () {
     DailyUpdate::factory()->create(['date' => '2026-10-23', 'done' => '<p>Someone else\'s work</p>']);
 
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->cloudPlan()->create());
     $this->travelTo(today()->setDate(2026, 10, 26));
 
     $this->get(route('huddle'))

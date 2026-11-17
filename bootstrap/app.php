@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\SignInDesktopUser;
+use App\Http\Middleware\UseUserTimezone;
 use Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -16,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
             SignInDesktopUser::class,
+            UseUserTimezone::class,
         ]);
 
         // Sign the desktop user in before the auth middleware checks for a login.

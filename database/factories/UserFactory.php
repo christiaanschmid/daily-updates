@@ -47,6 +47,16 @@ class UserFactory extends Factory
     }
 
     /**
+     * Indicate that the user has the cloud plan, with full history on the web.
+     */
+    public function cloudPlan(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'cloud_plan_granted' => true,
+        ]);
+    }
+
+    /**
      * Indicate that the model has two-factor authentication configured.
      */
     public function withTwoFactor(): static

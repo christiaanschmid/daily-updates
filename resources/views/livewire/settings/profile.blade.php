@@ -26,6 +26,17 @@
                 </div>
             @enddesktop
 
+            <flux:select wire:model="timezone" :label="__('Timezone')" :description="__('A new day starts at midnight in this timezone.')">
+                <option value="">{{ $this->defaultTimezoneLabel }}</option>
+                @foreach ($this->timezones as $region => $zones)
+                    <optgroup label="{{ $region }}">
+                        @foreach ($zones as $zone)
+                            <option value="{{ $zone }}">{{ str_replace('_', ' ', $zone) }}</option>
+                        @endforeach
+                    </optgroup>
+                @endforeach
+            </flux:select>
+
             <div class="flex items-center gap-4">
                 <flux:button variant="primary" type="submit">{{ __('Save') }}</flux:button>
             </div>

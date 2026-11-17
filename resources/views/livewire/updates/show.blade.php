@@ -70,6 +70,18 @@
     @endif
     --}}
 
+    @if ($this->locked)
+        <div class="mt-9 rounded-2xl border border-dashed border-zinc-700 px-6 py-12 text-center" data-test="history-limit-notice">
+            <p class="font-semibold text-zinc-100">{{ __('This day is outside your last :days days', ['days' => \App\Models\User::FREE_HISTORY_DAYS]) }}</p>
+            <p class="mx-auto mt-2 max-w-md text-sm text-zinc-400">
+                @if ($this->update)
+                    {{ __('The free plan shows your last :days days of logs. Your log for this day is kept, and it shows again when you upgrade to the cloud plan.', ['days' => \App\Models\User::FREE_HISTORY_DAYS]) }}
+                @else
+                    {{ __('The free plan shows and writes logs for your last :days days. Upgrade to the cloud plan to log any day.', ['days' => \App\Models\User::FREE_HISTORY_DAYS]) }}
+                @endif
+            </p>
+        </div>
+    @else
     @if ($day->isToday())
         <div class="mt-9">
             <livewire:todos.panel wire:key="todos" />
@@ -193,5 +205,6 @@
                 </div>
             </div>
         </flux:modal>
+    @endif
     @endif
 </div>

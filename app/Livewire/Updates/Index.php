@@ -15,6 +15,7 @@ use Livewire\WithPagination;
 /**
  * @property-read LengthAwarePaginator<int, DailyUpdate> $updates
  * @property-read bool $hasTodaysUpdate
+ * @property-read int $hiddenUpdatesCount
  */
 #[Title('History')]
 class Index extends Component
@@ -42,7 +43,7 @@ class Index extends Component
     {
         $search = trim($this->search);
 
-        return Auth::user()->dailyUpdates()
+        return Auth::user()->visibleUpdates()
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(function ($query) use ($search) {
                     foreach (array_keys(DailyUpdate::SECTIONS) as $section) {
@@ -62,6 +63,17 @@ class Index extends Component
     public function hasTodaysUpdate(): bool
     {
         return Auth::user()->dailyUpdates()->whereDate('date', today())->exists();
+    }
+
+    /**
+     * How many older updates a free web account can't see.
+     */
+    #[Computed]
+    public function hiddenUpdatesCount(): int
+    {
+        $start = Auth::user()->historyStartsOn();
+
+        return $start === null ? 0 : Auth::user()->dailyUpdates()->whereDate('date', '<', $start)->count();
     }
 
     public function render(): View

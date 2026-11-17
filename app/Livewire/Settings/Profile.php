@@ -7,6 +7,7 @@ use App\Support\Desktop;
 use Flux\Flux;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -21,12 +22,18 @@ class Profile extends Component
     public string $email = '';
 
     /**
+     * The chosen timezone, or an empty string to use the default.
+     */
+    public string $timezone = '';
+
+    /**
      * Mount the component.
      */
     public function mount(): void
     {
         $this->name = Auth::user()->name;
         $this->email = Auth::user()->email;
+        $this->timezone = Auth::user()->timezone ?? '';
     }
 
     /**
@@ -36,9 +43,12 @@ class Profile extends Component
     {
         $user = Auth::user();
 
-        $validated = $this->validate($this->profileRules($user->id));
+        $validated = $this->validate([
+            ...$this->profileRules($user->id),
+            'timezone' => ['nullable', 'string', Rule::in(timezone_identifiers_list())],
+        ]);
 
-        $user->fill($validated);
+        $user->fill([...$validated, 'timezone' => $validated['timezone'] ?: null]);
 
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
@@ -65,6 +75,36 @@ class Profile extends Component
         $user->sendEmailVerificationNotification();
 
         Flux::toast(text: __('A new verification link has been sent to your email address.'));
+    }
+
+    /**
+     * Every timezone, grouped by region for the picker.
+     *
+     * @return array<string, list<string>>
+     */
+    #[Computed]
+    public function timezones(): array
+    {
+        $groups = [];
+
+        foreach (timezone_identifiers_list() as $timezone) {
+            // "America/Phoenix" goes under "America"; "UTC" has no region.
+            $region = explode('/', $timezone, 2)[0];
+            $groups[$region === $timezone ? 'Other' : $region][] = $timezone;
+        }
+
+        return $groups;
+    }
+
+    /**
+     * What an unset timezone means: the Mac's own in the desktop app, the app's default on the web.
+     */
+    #[Computed]
+    public function defaultTimezoneLabel(): string
+    {
+        return Desktop::running()
+            ? __('Same as this Mac (:timezone)', ['timezone' => Desktop::systemTimezone() ?? config('app.default_timezone')])
+            : __('Default (:timezone)', ['timezone' => config('app.default_timezone')]);
     }
 
     #[Computed]

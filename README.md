@@ -79,7 +79,20 @@ The web version can be hosted on [Laravel Cloud](https://cloud.laravel.com) with
    SESSION_DRIVER=database
    ```
 
+   `APP_TIMEZONE` is only the default. Each account's timezone is picked up from the browser when they register, and can be changed in **Settings → Profile**.
 7. **Deploy.** Laravel Cloud deploys again whenever you push to the environment's branch.
+
+### Free and cloud plans
+
+On the web, a free account sees and writes logs for its last 14 days. Older logs are kept, and show again on the cloud plan, which has the full history. The desktop app has no limit, because everything stays on your Mac.
+
+Until subscriptions are added, you give an account the cloud plan by hand. In Laravel Cloud, go to the environment's **Commands** tab, click **Open console** and run:
+
+```bash
+php artisan cloud-plan:grant someone@example.com
+```
+
+Add `--revoke` to take it away again.
 
 The app has no queued jobs or scheduled tasks, so it doesn't need a queue worker or the scheduler. The desktop app isn't affected by any of this: it always uses its own SQLite database on your Mac.
 

@@ -76,4 +76,14 @@
     </div>
 
     <flux:pagination :paginator="$this->updates" />
+
+    @if ($this->hiddenUpdatesCount > 0)
+        <p class="rounded-xl border border-[#1f2840] bg-[#111727] px-4 py-3 text-sm text-zinc-400" data-test="history-limit-notice">
+            {{ trans_choice(
+                '{1} The free plan shows your last :days days. :count older log is kept, and shows again when you upgrade to the cloud plan.|[2,*] The free plan shows your last :days days. :count older logs are kept, and show again when you upgrade to the cloud plan.',
+                $this->hiddenUpdatesCount,
+                ['days' => \App\Models\User::FREE_HISTORY_DAYS],
+            ) }}
+        </p>
+    @endif
 </section>

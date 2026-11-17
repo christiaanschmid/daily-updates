@@ -8,7 +8,7 @@ use App\Models\User;
 use Livewire\Livewire;
 
 test('a todo can be added to the list', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->cloudPlan()->create();
 
     $this->actingAs($user);
 
@@ -23,7 +23,7 @@ test('a todo can be added to the list', function () {
 });
 
 test('a todo needs a title', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->cloudPlan()->create());
 
     Livewire::test(Panel::class)
         ->set('title', '   ')
@@ -34,7 +34,7 @@ test('a todo needs a title', function () {
 });
 
 test('checking off a todo moves it off the list without touching done', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->cloudPlan()->create();
     $todo = Todo::factory()->for($user)->create(['title' => 'Review ABC-101 PR']);
     DailyUpdate::factory()->for($user)->create(['date' => today(), 'done' => '<ul><li><p>Team standup</p></li></ul>']);
 
@@ -50,7 +50,7 @@ test('checking off a todo moves it off the list without touching done', function
 });
 
 test('the completed todos section lists only the todos checked off that day', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->cloudPlan()->create();
     Todo::factory()->for($user)->create(['title' => 'Second today', 'completed_at' => today()->setTime(11, 0)]);
     Todo::factory()->for($user)->create(['title' => 'First today', 'completed_at' => today()->setTime(9, 0)]);
     Todo::factory()->for($user)->create(['title' => 'Done yesterday', 'completed_at' => today()->subDay()->setTime(16, 0)]);
@@ -69,7 +69,7 @@ test('the completed todos section lists only the todos checked off that day', fu
 });
 
 test('a todo checked off today can be reopened', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->cloudPlan()->create();
     $todo = Todo::factory()->for($user)->completed()->create(['title' => 'Review ABC-101 PR']);
 
     $this->actingAs($user);
@@ -83,7 +83,7 @@ test('a todo checked off today can be reopened', function () {
 });
 
 test('todos checked off on an earlier day cannot be reopened', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->cloudPlan()->create();
     $todo = Todo::factory()->for($user)->create(['completed_at' => today()->subDay()->setTime(16, 0)]);
 
     $this->actingAs($user);
@@ -96,7 +96,7 @@ test('todos checked off on an earlier day cannot be reopened', function () {
 });
 
 test('completed todos come after up next, and show on earlier days only when there are some', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->cloudPlan()->create();
     DailyUpdate::factory()->for($user)->create(['date' => today()->subDays(2)]);
     DailyUpdate::factory()->for($user)->create(['date' => today()->subDay()]);
     Todo::factory()->for($user)->create(['completed_at' => today()->subDay()->setTime(16, 0)]);
@@ -112,7 +112,7 @@ test('completed todos come after up next, and show on earlier days only when the
 });
 
 test('completed todos are shared at the huddle and in the copied text', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->cloudPlan()->create();
     $update = DailyUpdate::factory()->for($user)->create([
         'date' => today()->subDay(),
         'done' => '<ul><li><p>Team standup</p></li></ul>',
@@ -132,7 +132,7 @@ test('completed todos are shared at the huddle and in the copied text', function
 });
 
 test('todos checked off on an earlier day are not listed', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->cloudPlan()->create();
     Todo::factory()->for($user)->create(['title' => 'Older todo', 'completed_at' => today()->subDay()->setTime(16, 0)]);
 
     $this->actingAs($user);
@@ -141,7 +141,7 @@ test('todos checked off on an earlier day are not listed', function () {
 });
 
 test('a todo can be deleted', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->cloudPlan()->create();
     $todo = Todo::factory()->for($user)->create();
 
     $this->actingAs($user);
@@ -154,7 +154,7 @@ test('a todo can be deleted', function () {
 test('another user\'s todos can be neither seen nor changed', function () {
     $todo = Todo::factory()->create(['title' => 'Someone else\'s todo']);
 
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->cloudPlan()->create());
 
     Livewire::test(Panel::class)
         ->assertDontSee('Someone else\'s todo')
@@ -165,14 +165,14 @@ test('another user\'s todos can be neither seen nor changed', function () {
 });
 
 test('the todo list only appears on today\'s update', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->cloudPlan()->create());
 
     $this->get(route('updates.show', today()->format('Y-m-d')))->assertSeeLivewire(Panel::class);
     $this->get(route('updates.show', today()->subDay()->format('Y-m-d')))->assertDontSeeLivewire(Panel::class);
 });
 
 test('the todo list comes before done on today\'s update, whether editing or not', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->cloudPlan()->create();
     $this->actingAs($user);
 
     $this->get(route('updates.show', today()->format('Y-m-d')))
@@ -196,7 +196,7 @@ test('todo titles show their inline markdown, with html escaped and unsafe links
 ]);
 
 test('todo markdown is shown on the list', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->cloudPlan()->create();
     Todo::factory()->for($user)->create(['title' => 'Run `php artisan migrate`']);
 
     $this->actingAs($user);
@@ -205,7 +205,7 @@ test('todo markdown is shown on the list', function () {
 });
 
 test('a todo on the list can be renamed', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->cloudPlan()->create();
     $todo = Todo::factory()->for($user)->create(['title' => 'Reveiw ABC-101']);
 
     $this->actingAs($user);
@@ -219,7 +219,7 @@ test('a todo on the list can be renamed', function () {
 });
 
 test('a todo cannot be renamed to nothing or past the length limit', function (string $title) {
-    $user = User::factory()->create();
+    $user = User::factory()->cloudPlan()->create();
     $todo = Todo::factory()->for($user)->create(['title' => 'Review ABC-101']);
 
     $this->actingAs($user);
@@ -237,7 +237,7 @@ test('a todo cannot be renamed to nothing or past the length limit', function (s
 test('another user\'s todo cannot be renamed', function () {
     $todo = Todo::factory()->create(['title' => 'Someone else\'s todo']);
 
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->cloudPlan()->create());
 
     Livewire::test(Panel::class)
         ->call('rename', $todo->id, 'Mine now')
@@ -247,7 +247,7 @@ test('another user\'s todo cannot be renamed', function () {
 });
 
 test('a todo checked off today can be renamed, but not one from an earlier day', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->cloudPlan()->create();
     $today = Todo::factory()->for($user)->completed()->create(['title' => 'Reveiw ABC-101']);
     $earlier = Todo::factory()->for($user)->create(['title' => 'Older todo', 'completed_at' => today()->subDay()->setTime(16, 0)]);
 

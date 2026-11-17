@@ -46,7 +46,8 @@ class Index extends Component
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(function ($query) use ($search) {
                     foreach (array_keys(DailyUpdate::SECTIONS) as $section) {
-                        $query->orWhere($section, 'like', '%'.$search.'%');
+                        // whereLike ignores case on every database; a plain "like" is case-sensitive on Postgres.
+                        $query->orWhereLike($section, '%'.$search.'%', caseSensitive: false);
                     }
                 });
             })

@@ -292,6 +292,24 @@ test('the history lists updates newest first and can be searched', function () {
         ->assertDontSee('Friday, October 23, 2026');
 });
 
+test('history search ignores upper and lower case', function () {
+    $user = User::factory()->create();
+    DailyUpdate::factory()->for($user)->create(['date' => '2026-10-22', 'done' => '<p>Fixed OPS-301</p>']);
+    DailyUpdate::factory()->for($user)->create(['date' => '2026-10-23', 'done' => '<p>Reviewed the deploy plan</p>']);
+    DailyUpdate::factory()->for($user)->create(['date' => '2026-10-26', 'done' => '<p>Finished up ABC-102</p>']);
+
+    $this->actingAs($user);
+
+    Livewire::test(Index::class)
+        ->set('search', 'ops-301')
+        ->assertSee('Thursday, October 22, 2026')
+        ->assertDontSee('Friday, October 23, 2026')
+        ->set('search', 'DEPLOY PLAN')
+        ->assertSee('Friday, October 23, 2026')
+        ->assertDontSee('Thursday, October 22, 2026')
+        ->assertDontSee('Monday, October 26, 2026');
+});
+
 test('search matches are highlighted in the history', function () {
     $user = User::factory()->create();
     DailyUpdate::factory()->for($user)->create(['date' => '2026-10-22', 'done' => '<ul><li><p>Fixed OPS-301 issue</p></li></ul>']);

@@ -48,6 +48,41 @@ composer run dev
 
 Open the URL it prints (by default http://localhost:8000), register an account, and start logging. If you use [Laravel Herd](https://herd.laravel.com), the app is served at `http://daily-updates.test` without running a server yourself; run `npm run dev` for live asset reloading, or `npm run build` once.
 
+## Hosting on Laravel Cloud
+
+The web version can be hosted on [Laravel Cloud](https://cloud.laravel.com) with a MySQL database, so your logs are available from any device. SQLite doesn't work there, because Laravel Cloud resets the app's files on every deploy. The app also works with Postgres.
+
+1. **Create the app.** In Laravel Cloud, create an application from this GitHub repository and choose a region.
+2. **Add a database.** On the environment's canvas, click **Add database** and create a **Laravel MySQL** database in the same region. Laravel Cloud fills in the `DB_*` settings for you.
+3. **Set the build commands** (Settings → Deployments):
+
+   ```bash
+   composer install --no-dev
+   npm ci --audit false
+   npm run build
+   php artisan optimize
+   ```
+
+4. **Set the deploy command:**
+
+   ```bash
+   php artisan migrate --force
+   ```
+
+5. **Add email.** Registering sends a verification email. Click **Add resource → Emails** and connect a [Resend](https://resend.com) account. Laravel Cloud fills in `MAIL_MAILER`, `RESEND_API_KEY` and the sender address. Resend asks you to verify a sending domain with DNS records; Laravel Cloud suggests a subdomain such as `notifications.example.com`.
+6. **Set the environment variables** that aren't filled in for you:
+
+   ```dotenv
+   APP_NAME="Daily Updates"
+   APP_TIMEZONE=America/Phoenix
+   CACHE_STORE=database
+   SESSION_DRIVER=database
+   ```
+
+7. **Deploy.** Laravel Cloud deploys again whenever you push to the environment's branch.
+
+The app has no queued jobs or scheduled tasks, so it doesn't need a queue worker or the scheduler. The desktop app isn't affected by any of this: it always uses its own SQLite database on your Mac.
+
 ## Desktop app
 
 Daily Updates also runs as a Mac app, built with [NativePHP](https://nativephp.com/docs/desktop). It's the same app in its own window, with no server to run and no login: it signs you in automatically as its one local user.

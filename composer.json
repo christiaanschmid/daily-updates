@@ -18,6 +18,7 @@
         "livewire/flux": "^2.13.1",
         "livewire/livewire": "^4.1",
         "nativephp/desktop": "^2.5",
+        "resend/resend-php": "^1.18",
         "symfony/html-sanitizer": "^7.4"
     },
     "require-dev": {
@@ -69,7 +70,7 @@
             "@test"
         ],
         "types:check": [
-            "phpstan analyse"
+            "phpstan analyse --memory-limit=512M"
         ],
         "test": [
             "@php artisan config:clear --ansi",
@@ -83,7 +84,7 @@
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
-            "@php artisan native:install --force --quiet",
+            "@php artisan native:install --force --quiet --no-interaction",
             "@php artisan boost:update --ansi"
         ],
         "post-root-package-install": [

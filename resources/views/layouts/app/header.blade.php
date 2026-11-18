@@ -15,10 +15,18 @@
         @endphp
 
         @desktop
-            {{-- The Mac window's toolbar: the title bar is hidden, so this strip holds the window buttons and moves the window. --}}
-            <header class="app-drag sticky top-0 z-30 border-b border-[#1a2133] bg-zinc-950/85 backdrop-blur-xl">
-                <div class="relative flex h-13 items-center ps-20 pe-3">
-                    <nav aria-label="{{ __('Main') }}" class="app-no-drag absolute start-1/2 flex -translate-x-1/2 gap-0.5 rounded-lg bg-[#131a2b] p-0.5">
+            {{--
+                The Mac window's toolbar: the title bar is hidden, so this strip holds the window buttons.
+                Only its empty parts move the window. A button inside a dragging area can lose its clicks
+                to the window drag, so no button sits inside one.
+            --}}
+            <header class="sticky top-0 z-30 border-b border-[#1a2133] bg-zinc-950/85 backdrop-blur-xl select-none">
+                {{-- Three columns, so the centered nav can never cover the buttons on the right, however narrow the window. --}}
+                <div class="grid h-13 grid-cols-[1fr_auto_1fr] items-center">
+                    {{-- Starts after the window buttons, which macOS draws over this corner. --}}
+                    <span class="app-drag ms-20 self-stretch"></span>
+
+                    <nav aria-label="{{ __('Main') }}" class="mx-2 flex gap-0.5 rounded-lg bg-[#131a2b] p-0.5">
                         @foreach ($navItems as $item)
                             <a
                                 href="{{ $item['href'] }}"
@@ -35,20 +43,20 @@
                         @endforeach
                     </nav>
 
-                    <span class="grow"></span>
+                    <div class="flex items-center gap-1 self-stretch pe-3">
+                        <span class="app-drag grow self-stretch"></span>
 
-                    <livewire:desktop.sync-status />
+                        <livewire:desktop.sync-status />
 
-                    <flux:tooltip :content="__('Settings')" position="bottom">
                         <a
                             href="{{ route('profile.edit') }}"
-                            class="app-no-drag grid size-8 place-items-center rounded-md text-zinc-400 transition-colors hover:bg-[#131a2b] hover:text-zinc-100"
+                            class="grid size-8 place-items-center rounded-md text-zinc-400 transition-colors hover:bg-[#131a2b] hover:text-zinc-100"
                             aria-label="{{ __('Settings') }}"
                             wire:navigate
                         >
                             <flux:icon.cog-6-tooth variant="outline" class="size-[18px]" />
                         </a>
-                    </flux:tooltip>
+                    </div>
                 </div>
             </header>
         @else

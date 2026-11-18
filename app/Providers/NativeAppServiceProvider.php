@@ -34,6 +34,8 @@ class NativeAppServiceProvider implements ProvidesPhpIni
             // Links to other sites open in the default browser, never in this window.
             ->preventLeaveDomain()
             ->suppressNewWindows()
+            // NativePHP opens DevTools docked in development, squeezing the app; View > Toggle Developer Tools opens them.
+            ->showDevTools(false)
             ->rememberState();
 
         Menu::create(

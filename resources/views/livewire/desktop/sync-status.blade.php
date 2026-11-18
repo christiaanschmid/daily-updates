@@ -12,7 +12,7 @@
         <flux:tooltip :content="$label" position="bottom">
             <a
                 href="{{ route('plan.edit') }}"
-                class="app-no-drag grid size-8 place-items-center rounded-md text-zinc-400 transition-colors hover:bg-[#131a2b] hover:text-zinc-100"
+                class="grid size-8 place-items-center rounded-md text-zinc-400 transition-colors hover:bg-[#131a2b] hover:text-zinc-100"
                 aria-label="{{ $label }}"
                 data-test="sync-status"
                 wire:navigate

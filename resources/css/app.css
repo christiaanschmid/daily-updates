@@ -99,22 +99,16 @@ select:focus[data-flux-control] {
 }
 
 /*
- * The Mac app. Its window has no title bar, so the toolbar moves the window, and
- * controls behave like a Mac app's rather than a web page's.
+ * The Mac app. Its window has no title bar, so the toolbar's empty space moves the
+ * window, and controls behave like a Mac app's rather than a web page's.
  */
 html[data-desktop] {
     --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', ui-sans-serif, system-ui, sans-serif;
 }
 
+/* An empty part of the toolbar that moves the window. Never put a control inside one: its clicks can go to the drag. */
 [data-desktop] .app-drag {
     -webkit-app-region: drag;
-    -webkit-user-select: none;
-    user-select: none;
-}
-
-[data-desktop] .app-drag :is(a, button, input, select, [role='button']),
-[data-desktop] .app-no-drag {
-    -webkit-app-region: no-drag;
 }
 
 /* Mac apps use the arrow cursor for buttons and links, not the pointing hand. */

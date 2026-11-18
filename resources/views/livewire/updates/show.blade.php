@@ -11,7 +11,8 @@
     $barPrimary = 'inline-flex h-9 cursor-pointer items-center gap-2 rounded-[10px] bg-accent px-4 text-sm font-semibold text-accent-foreground transition-opacity hover:opacity-90';
 @endphp
 
-<div class="mx-auto w-full max-w-[720px]">
+{{-- On the web, picks up changes made elsewhere, such as in the Mac app. The Mac app hears about them when it syncs. --}}
+<div class="mx-auto w-full max-w-[720px]" @unlessdesktop wire:poll.20s="checkForChanges" @enddesktop>
     <div class="space-y-3.5">
         <div class="flex flex-wrap items-center gap-2">
             @if ($this->previousUpdate)

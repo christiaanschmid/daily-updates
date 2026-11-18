@@ -4,6 +4,7 @@ namespace App\Livewire\Updates;
 
 use App\Events\CloudSynced;
 use App\Models\DailyUpdate;
+use App\Sync\LogMerge;
 use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Carbon;
@@ -48,6 +49,17 @@ class Show extends Component
      * When the update was last saved on this page, for the save status.
      */
     public ?string $lastSavedAt = null;
+
+    /**
+     * The sections the editors' text is based on: the saved update they started from,
+     * or last saved, or null when there was none. If the saved update no longer
+     * matches it, it was changed elsewhere, such as on another device, and saving
+     * combines the two instead of writing over the other change.
+     *
+     * @var array<string, string|null>|null
+     */
+    #[Locked]
+    public ?array $base = null;
 
     /**
      * Mount the component for the given day, starting a new update when none exists yet.
@@ -141,6 +153,13 @@ class Show extends Component
     {
         abort_if($this->locked, 403);
 
+        // Start from the update as it's saved now, which may have changed since the page opened.
+        unset($this->update);
+
+        if ($this->update) {
+            $this->fillFromUpdate();
+        }
+
         foreach (array_keys(DailyUpdate::SECTIONS) as $section) {
             if (blank(strip_tags($this->{$section}))) {
                 $this->{$section} = self::EMPTY_BULLET_LIST;
@@ -216,17 +235,48 @@ class Show extends Component
     }
 
     /**
-     * Mac app: show what a sync brought in from the cloud. While a section is being
-     * edited it stays as typed; the next sync sends it, combined with the cloud's.
+     * Show changes made elsewhere: on the Mac, after a sync brings them in, and on
+     * the web, checked every so often. An open editor gets the change too, once its
+     * typing is saved; see acknowledgeRefresh().
      */
     #[On('native:'.CloudSynced::class)]
-    public function refreshFromCloud(): void
+    public function checkForChanges(): void
     {
         unset($this->update, $this->previousUpdate, $this->nextUpdate, $this->hasCompletedTodos);
 
-        if (! $this->editing && $this->update) {
+        if (self::sectionsOf($this->update) === $this->base) {
+            $this->skipRender();
+
+            return;
+        }
+
+        if (! $this->editing) {
+            if ($this->update) {
+                $this->fillFromUpdate();
+            }
+
+            return;
+        }
+
+        // Deleted elsewhere while being edited here: the edit wins, and saving brings it back.
+        if ($this->update) {
+            $this->sendToEditors($this->update);
+        }
+    }
+
+    /**
+     * The editors now show the saved update with this fingerprint, so saving them may
+     * write over it. If it has changed again since, the next save combines it again.
+     */
+    public function acknowledgeRefresh(string $hash): void
+    {
+        unset($this->update);
+
+        if ($this->update !== null && self::fingerprint(self::sectionsOf($this->update)) === $hash) {
             $this->fillFromUpdate();
         }
+
+        $this->skipRender();
     }
 
     public function render(): View
@@ -248,6 +298,9 @@ class Show extends Component
             'up_next' => ['nullable', 'string', 'max:'.DailyUpdate::MAX_SECTION_LENGTH],
         ]);
 
+        // Always the update as it's saved right now, to notice a change made elsewhere.
+        unset($this->update);
+
         $hasContent = collect(array_keys(DailyUpdate::SECTIONS))
             ->contains(fn (string $section) => filled(strip_tags($this->{$section})));
 
@@ -255,11 +308,77 @@ class Show extends Component
             return;
         }
 
-        Auth::user()->dailyUpdates()->updateOrCreate(['date' => $this->day()], $validated);
+        $saved = $this->update;
+
+        if ($saved !== null && self::sectionsOf($saved) !== $this->base) {
+            $this->combineWith($saved, $validated);
+        } else {
+            $saved = Auth::user()->dailyUpdates()->updateOrCreate(['date' => $this->day()], $validated);
+            $this->base = self::sectionsOf($saved);
+        }
 
         unset($this->update);
 
         $this->lastSavedAt = now()->format('g:i A');
+    }
+
+    /**
+     * The update changed elsewhere since the editors loaded it: apply both changes,
+     * and show the result in the editors.
+     *
+     * @param  array<string, string|null>  $validated
+     */
+    protected function combineWith(DailyUpdate $saved, array $validated): void
+    {
+        $mine = collect(LogMerge::SECTIONS)->mapWithKeys(fn (string $section) => [$section => DailyUpdate::sanitize($validated[$section] ?? null)])->all();
+
+        foreach (LogMerge::SECTIONS as $section) {
+            $saved->{$section} = LogMerge::threeWay($this->base[$section] ?? null, $mine[$section], $saved->{$section});
+        }
+
+        if ($saved->isDirty()) {
+            $saved->save();
+        }
+
+        // The editors' text is what they sent, until they show the combined update.
+        $this->base = $mine;
+
+        if (self::sectionsOf($saved) !== $mine) {
+            $this->sendToEditors($saved);
+        }
+    }
+
+    /**
+     * Give the open editors the saved update. Each one shows it once the person
+     * pauses typing, then confirms with acknowledgeRefresh().
+     */
+    protected function sendToEditors(DailyUpdate $saved): void
+    {
+        $this->dispatch(
+            'log-refreshed',
+            sections: collect(LogMerge::SECTIONS)->mapWithKeys(fn (string $section) => [$section => (string) $saved->{$section}])->all(),
+            hash: self::fingerprint(self::sectionsOf($saved)),
+        );
+    }
+
+    /**
+     * A saved update's sections, or null when there is none.
+     *
+     * @return array<string, string|null>|null
+     */
+    protected static function sectionsOf(?DailyUpdate $update): ?array
+    {
+        return $update === null ? null : collect(LogMerge::SECTIONS)->mapWithKeys(fn (string $section) => [$section => $update->{$section}])->all();
+    }
+
+    /**
+     * A short fingerprint of sections, for the editors to confirm which version they show.
+     *
+     * @param  array<string, string|null>|null  $sections
+     */
+    protected static function fingerprint(?array $sections): string
+    {
+        return md5((string) json_encode($sections));
     }
 
     /**
@@ -286,5 +405,6 @@ class Show extends Component
     {
         $this->done = (string) $this->update->done;
         $this->up_next = (string) $this->update->up_next;
+        $this->base = self::sectionsOf($this->update);
     }
 }

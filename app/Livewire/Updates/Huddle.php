@@ -2,10 +2,12 @@
 
 namespace App\Livewire\Updates;
 
+use App\Events\CloudSynced;
 use App\Models\DailyUpdate;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
@@ -26,6 +28,15 @@ class Huddle extends Component
             ->whereDate('date', '<', today())
             ->latest('date')
             ->first();
+    }
+
+    /**
+     * Mac app: show what a sync brought in from the cloud.
+     */
+    #[On('native:'.CloudSynced::class)]
+    public function refreshFromCloud(): void
+    {
+        // Re-renders with the latest logs.
     }
 
     public function render(): View

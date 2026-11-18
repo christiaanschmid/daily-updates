@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Updates;
 
+use App\Events\CloudSynced;
 use App\Models\DailyUpdate;
 use Flux\Flux;
 use Illuminate\Contracts\View\View;
@@ -9,6 +10,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 /**
@@ -211,6 +213,20 @@ class Show extends Component
     public function locked(): bool
     {
         return ! Auth::user()->canSeeDay($this->day());
+    }
+
+    /**
+     * Mac app: show what a sync brought in from the cloud. While a section is being
+     * edited it stays as typed; the next sync sends it, combined with the cloud's.
+     */
+    #[On('native:'.CloudSynced::class)]
+    public function refreshFromCloud(): void
+    {
+        unset($this->update, $this->previousUpdate, $this->nextUpdate, $this->hasCompletedTodos);
+
+        if (! $this->editing && $this->update) {
+            $this->fillFromUpdate();
+        }
     }
 
     public function render(): View

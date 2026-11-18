@@ -5,9 +5,9 @@ namespace App\Events;
 use Native\Desktop\Events\Contracts\DispatchableFromNative;
 
 /**
- * Fired by the Mac app's "Use This Mac's Data Instead" menu item.
+ * Fired by the Mac app's File > Sync Now menu item.
  */
-class UseLocalDataRequested implements DispatchableFromNative
+class SyncNowRequested implements DispatchableFromNative
 {
     /**
      * NativePHP passes the clicked menu item and any key combination.

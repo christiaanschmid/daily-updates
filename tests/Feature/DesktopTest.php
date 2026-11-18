@@ -3,6 +3,7 @@
 use App\Livewire\Settings\Profile;
 use App\Models\User;
 use Livewire\Livewire;
+use Native\Desktop\Facades\Shell;
 
 beforeEach(function () {
     config(['nativephp-internal.running' => true]);
@@ -59,4 +60,50 @@ test('the browser version still requires a login', function () {
     $this->get(route('dashboard'))->assertRedirect(route('login'));
 
     expect(User::count())->toBe(0);
+});
+
+test('the window has a Mac toolbar instead of the website header', function () {
+    $this->get(route('dashboard'))
+        ->assertOk()
+        ->assertSee('data-desktop', false)
+        ->assertSee('app-drag', false)
+        ->assertDontSee('data-test="sidebar-menu-button"', false);
+
+    config(['nativephp-internal.running' => false]);
+    $this->actingAs(User::factory()->create());
+
+    $this->get(route('dashboard'))
+        ->assertOk()
+        ->assertDontSee('data-desktop', false)
+        ->assertSee('data-test="sidebar-menu-button"', false);
+});
+
+test('links to other sites open in the default browser', function () {
+    Shell::fake();
+    $this->get(route('dashboard'));
+
+    $this->postJson(route('desktop.open-external'), ['url' => 'https://example.com/page'])->assertNoContent();
+    $this->postJson(route('desktop.open-external'), ['url' => 'mailto:someone@example.com'])->assertNoContent();
+
+    Shell::assertOpenedExternal('https://example.com/page');
+    Shell::assertOpenedExternal('mailto:someone@example.com');
+});
+
+test('only web and email links can be opened', function () {
+    Shell::fake();
+    $this->get(route('dashboard'));
+
+    $this->postJson(route('desktop.open-external'), ['url' => 'javascript:alert(1)'])->assertUnprocessable();
+    $this->postJson(route('desktop.open-external'), ['url' => 'file:///etc/passwd'])->assertUnprocessable();
+});
+
+test('the browser version can\'t open links on the server', function () {
+    config(['nativephp-internal.running' => false]);
+    $this->actingAs(User::factory()->create());
+
+    $this->postJson(route('desktop.open-external'), ['url' => 'https://example.com'])->assertNotFound();
+});
+
+test('the Go menu\'s Today opens today\'s page', function () {
+    $this->get(route('today'))->assertRedirect(route('updates.show', today()->format('Y-m-d')));
 });

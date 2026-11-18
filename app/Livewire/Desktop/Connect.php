@@ -11,7 +11,7 @@ use Livewire\Component;
 
 /**
  * The page the Mac app opens in the browser, where the signed-in user approves
- * moving that Mac's logs into their account.
+ * syncing that Mac with their account.
  */
 #[Title('Connect your Mac')]
 class Connect extends Component
@@ -25,7 +25,7 @@ class Connect extends Component
     }
 
     /**
-     * Approve the connection, so the Mac app can upload its logs to this account.
+     * Approve the connection, so the Mac app can sync with this account.
      */
     public function approve(): void
     {

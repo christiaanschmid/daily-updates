@@ -8,7 +8,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 /**
- * One "Move to cloud" from the Mac app.
+ * A Mac app connected to a cloud account. It starts as a request the user
+ * approves in their browser, then the Mac syncs with the token it was given.
  *
  * @property int $id
  * @property string $code
@@ -16,7 +17,8 @@ use Illuminate\Support\Str;
  * @property int|null $user_id
  * @property Carbon|null $approved_at
  * @property Carbon|null $finished_at
- * @property Carbon|null $login_used_at
+ * @property string|null $token_hash
+ * @property Carbon|null $last_synced_at
  * @property Carbon $expires_at
  * @property-read User|null $user
  */
@@ -35,8 +37,6 @@ class DesktopConnection extends Model
     /**
      * How long the one-time sign-in link for the app's window stays valid.
      */
-    public const LOGIN_LINK_MINUTES = 5;
-
     /**
      * @var list<string>
      */
@@ -47,7 +47,7 @@ class DesktopConnection extends Model
         return [
             'approved_at' => 'datetime',
             'finished_at' => 'datetime',
-            'login_used_at' => 'datetime',
+            'last_synced_at' => 'datetime',
             'expires_at' => 'datetime',
         ];
     }
@@ -105,6 +105,34 @@ class DesktopConnection extends Model
             'approved_at' => now(),
             'expires_at' => now()->addMinutes(self::UPLOAD_MINUTES),
         ])->save();
+    }
+
+    /**
+     * Finish the connection and give the Mac app the token it syncs with from now on.
+     * Only a hash is kept here.
+     */
+    public function issueToken(): string
+    {
+        $token = Str::random(64);
+
+        $this->forceFill(['finished_at' => now(), 'token_hash' => self::hashSecret($token)])->save();
+
+        return $token;
+    }
+
+    /**
+     * The finished connection a Mac app's sync token belongs to.
+     */
+    public static function forToken(string $token): ?self
+    {
+        if ($token === '') {
+            return null;
+        }
+
+        return self::query()
+            ->where('token_hash', self::hashSecret($token))
+            ->whereNotNull('finished_at')
+            ->first();
     }
 
     /**

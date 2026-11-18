@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Todos;
 
+use App\Events\CloudSynced;
 use App\Models\Todo;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
@@ -78,6 +79,7 @@ class Panel extends Component
      * Show the list again after a todo is reopened elsewhere on the page.
      */
     #[On('todos-changed')]
+    #[On('native:'.CloudSynced::class)]
     public function refreshList(): void
     {
         unset($this->openTodos);

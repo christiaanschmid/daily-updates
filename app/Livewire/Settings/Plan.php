@@ -2,9 +2,11 @@
 
 namespace App\Livewire\Settings;
 
+use App\Events\CloudSynced;
+use App\Models\CloudLink;
 use App\Support\CloudClient;
-use App\Support\CloudMode;
 use App\Support\Desktop;
+use App\Sync\CloudSync;
 use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Client\RequestException;
@@ -12,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Laravel\Paddle\Subscription;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -20,10 +23,11 @@ use Throwable;
 
 /**
  * The cloud plan: subscribe through Paddle's checkout, or see and manage a
- * subscription. In the Mac app, this is where its logs move to the cloud.
+ * subscription. In the Mac app, this is where it starts and stops syncing with the cloud.
  *
  * @property-read Subscription|null $subscription
  * @property-read string|null $billingPeriod
+ * @property-read CloudLink|null $cloudLink
  */
 #[Title('Plan')]
 class Plan extends Component
@@ -36,33 +40,33 @@ class Plan extends Component
     public string $checkout = '';
 
     /**
-     * The Mac app's move to the cloud, while it waits for approval: "waiting", or an error to show.
+     * Mac app, while connecting to a cloud account: "waiting" for approval, or an error to show.
      */
-    public string $moveStatus = '';
+    public string $connectStatus = '';
 
     /**
      * Session key holding the connection's code and secret, kept out of the page.
      */
-    protected const MOVE_SESSION_KEY = 'move_to_cloud';
+    protected const CONNECT_SESSION_KEY = 'cloud_connect';
 
     /**
-     * Mac app: start moving this Mac's logs to the cloud. Opens the approval page in the browser.
+     * Mac app: start connecting to a cloud account. Opens the approval page in the browser.
      */
-    public function moveToCloud(CloudClient $cloud): void
+    public function turnOnSync(CloudClient $cloud): void
     {
         abort_unless(Desktop::running(), 404);
 
         try {
             $connection = $cloud->start();
         } catch (Throwable $e) {
-            Log::warning('Could not start moving to the cloud', ['exception' => $e]);
-            $this->moveStatus = __('Couldn\'t reach :host. Check your internet connection and try again.', ['host' => parse_url($cloud->baseUrl(), PHP_URL_HOST)]);
+            Log::warning('Could not start connecting to the cloud', ['exception' => $e]);
+            $this->connectStatus = __('Couldn\'t reach :host. Check your internet connection and try again.', ['host' => parse_url($cloud->baseUrl(), PHP_URL_HOST)]);
 
             return;
         }
 
-        session([self::MOVE_SESSION_KEY => $connection]);
-        $this->moveStatus = 'waiting';
+        session([self::CONNECT_SESSION_KEY => $connection]);
+        $this->connectStatus = 'waiting';
 
         Shell::openExternal($connection['approve_url']);
     }
@@ -72,7 +76,7 @@ class Plan extends Component
      */
     public function openApprovalPage(): void
     {
-        $connection = session(self::MOVE_SESSION_KEY);
+        $connection = session(self::CONNECT_SESSION_KEY);
 
         if (is_array($connection)) {
             Shell::openExternal($connection['approve_url']);
@@ -80,14 +84,14 @@ class Plan extends Component
     }
 
     /**
-     * Mac app: called every few seconds while waiting. Once approved, uploads
-     * everything, switches the app to the cloud and signs its window in.
+     * Mac app: called every few seconds while waiting. Once approved, this Mac
+     * starts syncing, beginning with everything on it.
      */
-    public function checkMoveToCloud(CloudClient $cloud, CloudMode $cloudMode): void
+    public function checkConnection(CloudClient $cloud, CloudSync $sync): void
     {
-        $connection = session(self::MOVE_SESSION_KEY);
+        $connection = session(self::CONNECT_SESSION_KEY);
 
-        if (! Desktop::running() || ! is_array($connection) || $this->moveStatus !== 'waiting') {
+        if (! Desktop::running() || ! is_array($connection) || $this->connectStatus !== 'waiting') {
             return;
         }
 
@@ -95,8 +99,8 @@ class Plan extends Component
             $status = $cloud->status($connection['code'], $connection['secret']);
 
             if ($status === 'expired') {
-                $this->cancelMoveToCloud();
-                $this->moveStatus = __('The approval link expired. Click Move to cloud to try again.');
+                $this->cancelConnecting();
+                $this->connectStatus = __('The approval link expired. Click Turn on sync to try again.');
 
                 return;
             }
@@ -105,34 +109,80 @@ class Plan extends Component
                 return;
             }
 
-            $cloud->upload(Auth::user(), $connection['code'], $connection['secret']);
-            $loginUrl = $cloud->finish($connection['code'], $connection['secret']);
+            $token = $cloud->finish($connection['code'], $connection['secret']);
         } catch (RequestException $e) {
-            Log::warning('Moving to the cloud failed', ['exception' => $e]);
-            $this->cancelMoveToCloud();
-            $this->moveStatus = $e->response->json('message') ?: __('Moving to the cloud failed. Your logs are still on this Mac. Try again.');
+            Log::warning('Connecting to the cloud failed', ['exception' => $e]);
+            $this->cancelConnecting();
+            $this->connectStatus = $e->response->json('message') ?: __('Connecting to the cloud failed. Try again.');
 
             return;
         } catch (Throwable $e) {
             // Probably a dropped connection; keep waiting and try again on the next check.
-            Log::warning('Checking the move to the cloud failed', ['exception' => $e]);
+            Log::warning('Checking the connection to the cloud failed', ['exception' => $e]);
 
             return;
         }
 
-        session()->forget(self::MOVE_SESSION_KEY);
-        $cloudMode->enable($cloud->baseUrl());
+        session()->forget(self::CONNECT_SESSION_KEY);
+        $this->connectStatus = '';
 
-        $this->redirect($loginUrl);
+        $sync->connect($cloud->baseUrl(), $token);
+        $sync->run();
+
+        unset($this->cloudLink);
     }
 
     /**
      * Mac app: stop waiting for approval.
      */
-    public function cancelMoveToCloud(): void
+    public function cancelConnecting(): void
     {
-        session()->forget(self::MOVE_SESSION_KEY);
-        $this->moveStatus = '';
+        session()->forget(self::CONNECT_SESSION_KEY);
+        $this->connectStatus = '';
+    }
+
+    /**
+     * Mac app: sync right away.
+     */
+    public function syncNow(CloudSync $sync): void
+    {
+        abort_unless(Desktop::running(), 404);
+
+        $sync->run();
+
+        unset($this->cloudLink);
+    }
+
+    /**
+     * Mac app: stop syncing. Everything stays on this Mac.
+     */
+    public function turnOffSync(CloudSync $sync): void
+    {
+        abort_unless(Desktop::running(), 404);
+
+        $sync->disconnect();
+
+        unset($this->cloudLink);
+
+        Flux::toast(text: __('Sync is off. Your logs stay on this Mac.'));
+    }
+
+    /**
+     * Mac app: the cloud account it syncs with, if any.
+     */
+    #[Computed]
+    public function cloudLink(): ?CloudLink
+    {
+        return Desktop::running() ? CloudLink::current() : null;
+    }
+
+    /**
+     * Mac app: show the latest sync after one in the background.
+     */
+    #[On('native:'.CloudSynced::class)]
+    public function refreshSync(): void
+    {
+        unset($this->cloudLink);
     }
 
     /**
@@ -140,7 +190,7 @@ class Plan extends Component
      */
     public function subscribe(string $period): void
     {
-        // Billing is on the web; the Mac app's Plan page only moves its logs to the cloud.
+        // Billing is on the web; the Mac app's Plan page only turns sync on and off.
         abort_if(Desktop::running(), 404);
 
         $priceId = config("services.paddle.prices.{$period}");
@@ -176,7 +226,7 @@ class Plan extends Component
      */
     public function cancel(): void
     {
-        // Billing is on the web; the Mac app's Plan page only moves its logs to the cloud.
+        // Billing is on the web; the Mac app's Plan page only turns sync on and off.
         abort_if(Desktop::running(), 404);
 
         $subscription = $this->subscription;
@@ -195,7 +245,7 @@ class Plan extends Component
      */
     public function keepSubscription(): void
     {
-        // Billing is on the web; the Mac app's Plan page only moves its logs to the cloud.
+        // Billing is on the web; the Mac app's Plan page only turns sync on and off.
         abort_if(Desktop::running(), 404);
 
         $subscription = $this->subscription;
@@ -212,7 +262,7 @@ class Plan extends Component
      */
     public function updatePaymentMethod(): void
     {
-        // Billing is on the web; the Mac app's Plan page only moves its logs to the cloud.
+        // Billing is on the web; the Mac app's Plan page only turns sync on and off.
         abort_if(Desktop::running(), 404);
 
         $subscription = $this->subscription;

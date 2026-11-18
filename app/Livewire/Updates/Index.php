@@ -2,11 +2,13 @@
 
 namespace App\Livewire\Updates;
 
+use App\Events\CloudSynced;
 use App\Models\DailyUpdate;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -74,6 +76,15 @@ class Index extends Component
         $start = Auth::user()->historyStartsOn();
 
         return $start === null ? 0 : Auth::user()->dailyUpdates()->whereDate('date', '<', $start)->count();
+    }
+
+    /**
+     * Mac app: show what a sync brought in from the cloud.
+     */
+    #[On('native:'.CloudSynced::class)]
+    public function refreshFromCloud(): void
+    {
+        // Re-renders with the latest logs.
     }
 
     public function render(): View

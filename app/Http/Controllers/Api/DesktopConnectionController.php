@@ -2,26 +2,18 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\DailyUpdate;
 use App\Models\DesktopConnection;
-use App\Models\Todo;
-use App\Support\CloudImport;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\URL;
 
 /**
- * What the Mac app calls to move its logs to the cloud. The approval link it
- * opens in the browser only carries the connection's code; everything here also
- * needs the secret the app started with, so the link alone can't do anything.
+ * What the Mac app calls to connect to a cloud account for sync. The approval
+ * link it opens in the browser only carries the connection's code; everything
+ * here also needs the secret the app started with, so the link alone can't do
+ * anything.
  */
 class DesktopConnectionController
 {
-    /**
-     * The most logs or todos one upload request may carry. The app sends more in batches.
-     */
-    public const MAX_PER_REQUEST = 200;
-
     /**
      * Start a connection and return the page the user approves it on.
      */
@@ -55,47 +47,13 @@ class DesktopConnectionController
     }
 
     /**
-     * Import a batch of logs and todos into the approved account.
-     */
-    public function import(Request $request, string $code): JsonResponse
-    {
-        $connection = $this->usableConnection($request, $code);
-
-        $validated = $request->validate([
-            'updates' => ['present', 'array', 'max:'.self::MAX_PER_REQUEST],
-            'updates.*.date' => ['required', 'date_format:Y-m-d'],
-            'updates.*.done' => ['nullable', 'string', 'max:'.DailyUpdate::MAX_SECTION_LENGTH],
-            'updates.*.up_next' => ['nullable', 'string', 'max:'.DailyUpdate::MAX_SECTION_LENGTH],
-            'todos' => ['present', 'array', 'max:'.self::MAX_PER_REQUEST],
-            'todos.*.title' => Todo::titleRules(),
-            'todos.*.completed_at' => ['nullable', 'date'],
-            'todos.*.created_at' => ['nullable', 'date'],
-        ]);
-
-        $import = new CloudImport($connection->user);
-
-        return response()->json([
-            'updates' => $import->updates($validated['updates']),
-            'todos' => $import->todos($validated['todos']),
-        ]);
-    }
-
-    /**
-     * Finish the move and return a one-time link that signs the app's window in.
+     * Finish an approved connection, giving the Mac app its sync token.
      */
     public function finish(Request $request, string $code): JsonResponse
     {
         $connection = $this->usableConnection($request, $code);
 
-        $connection->forceFill(['finished_at' => now()])->save();
-
-        return response()->json([
-            'login_url' => URL::temporarySignedRoute(
-                'desktop.login',
-                now()->addMinutes(DesktopConnection::LOGIN_LINK_MINUTES),
-                ['connection' => $connection->code],
-            ),
-        ]);
+        return response()->json(['token' => $connection->issueToken()]);
     }
 
     /**
@@ -112,7 +70,7 @@ class DesktopConnectionController
     }
 
     /**
-     * An approved connection that hasn't expired or finished, ready for uploads.
+     * An approved connection that hasn't expired or finished, ready to finish.
      */
     protected function usableConnection(Request $request, string $code): DesktopConnection
     {

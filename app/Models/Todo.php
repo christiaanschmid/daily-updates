@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Syncs;
 use Carbon\CarbonInterface;
 use Database\Factories\TodoFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -28,6 +29,8 @@ class Todo extends Model
     /** @use HasFactory<TodoFactory> */
     use HasFactory;
 
+    use Syncs;
+
     /**
      * The longest a todo's title may be.
      */
@@ -51,8 +54,15 @@ class Todo extends Model
     protected function casts(): array
     {
         return [
+            'needs_sync' => 'boolean',
+            'sync_version' => 'integer',
             'completed_at' => 'datetime',
         ];
+    }
+
+    public static function syncType(): string
+    {
+        return 'todo';
     }
 
     /**

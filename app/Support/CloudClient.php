@@ -2,22 +2,16 @@
 
 namespace App\Support;
 
-use App\Models\User;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
 /**
- * The Mac app's side of "Move to cloud": it talks to the hosted Daily Updates.
+ * The Mac app's calls to the hosted Daily Updates: connecting to an account, then syncing with it.
  */
 class CloudClient
 {
-    /**
-     * How many logs or todos go in one upload request; the server accepts up to 200.
-     */
-    public const BATCH_SIZE = 100;
-
     public function baseUrl(): string
     {
         return rtrim((string) config('services.cloud.url'), '/');
@@ -47,63 +41,35 @@ class CloudClient
     }
 
     /**
-     * Upload all of the user's logs and todos, in batches.
-     *
-     * @return array{updates: int, todos: int} How many logs and todos the cloud added or changed.
-     */
-    public function upload(User $user, string $code, string $secret): array
-    {
-        $totals = ['updates' => 0, 'todos' => 0];
-
-        $updates = $user->dailyUpdates()->oldest('date')->get()->map(fn ($update) => [
-            'date' => $update->date->format('Y-m-d'),
-            'done' => $update->done,
-            'up_next' => $update->up_next,
-        ]);
-
-        $todos = $user->todos()->oldest('id')->get()->map(fn ($todo) => [
-            'title' => $todo->title,
-            'completed_at' => $todo->completed_at?->toIso8601String(),
-            'created_at' => $todo->created_at?->toIso8601String(),
-        ]);
-
-        foreach ($updates->chunk(self::BATCH_SIZE) as $batch) {
-            $totals['updates'] += $this->send($code, $secret, $batch->values()->all(), [])['updates'];
-        }
-
-        foreach ($todos->chunk(self::BATCH_SIZE) as $batch) {
-            $totals['todos'] += $this->send($code, $secret, [], $batch->values()->all())['todos'];
-        }
-
-        return $totals;
-    }
-
-    /**
-     * Finish the move. Returns the one-time link that signs the app's window in.
+     * Finish the connection. Returns the token the Mac syncs with from now on.
      */
     public function finish(string $code, string $secret): string
     {
-        return (string) $this->http()->post("/api/desktop/connections/{$code}/finish", ['secret' => $secret])->throw()->json('login_url');
+        return (string) $this->http()->post("/api/desktop/connections/{$code}/finish", ['secret' => $secret])->throw()->json('token');
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $updates
-     * @param  array<int, array<string, mixed>>  $todos
-     * @return array{updates: int, todos: int}
+     * Send changes and get back everything that changed in the account after the cursor.
+     *
+     * @param  array<string, mixed>  $payload
+     * @return array{cursor: int, has_more: bool, updates: list<array<string, mixed>>, todos: list<array<string, mixed>>, deleted: list<array<string, mixed>>}
      */
-    protected function send(string $code, string $secret, array $updates, array $todos): array
+    public function sync(string $url, string $token, array $payload): array
     {
-        $response = $this->http()
-            ->post("/api/desktop/connections/{$code}/import", ['secret' => $secret, 'updates' => $updates, 'todos' => $todos])
-            ->throw()
-            ->json();
-
-        return ['updates' => (int) $response['updates'], 'todos' => (int) $response['todos']];
+        return $this->http($url)->withToken($token)->timeout(60)->post('/api/desktop/sync', $payload)->throw()->json();
     }
 
-    protected function http(): PendingRequest
+    /**
+     * Tell the cloud this Mac stopped syncing, so its token stops working.
+     */
+    public function disconnect(string $url, string $token): void
     {
-        return Http::baseUrl($this->baseUrl())->acceptJson()->asJson()->timeout(30)
+        $this->http($url)->withToken($token)->delete('/api/desktop/sync')->throw();
+    }
+
+    protected function http(?string $url = null): PendingRequest
+    {
+        return Http::baseUrl(rtrim($url ?? $this->baseUrl(), '/'))->acceptJson()->asJson()->timeout(30)
             ->retry(2, 1000, fn (\Throwable $e) => $e instanceof ConnectionException, throw: false);
     }
 }

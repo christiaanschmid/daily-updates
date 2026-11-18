@@ -97,3 +97,37 @@ select:focus[data-flux-control] {
 .du-prose {
     @apply [&_a]:text-accent-content [&_a]:underline [&_blockquote]:border-s-2 [&_blockquote]:border-zinc-700 [&_blockquote]:ps-3 [&_code]:rounded [&_code]:bg-white/10 [&_code]:px-1 [&_code]:font-mono [&_code]:text-[0.9em] [&_li]:my-0.5 [&_li>p]:my-0 [&_ol]:list-decimal [&_ol]:ps-5 [&_p]:my-1 [&_ul]:list-disc [&_ul]:ps-5 [&_ul_ul]:list-[circle] [&_ul_ul_ul]:list-[square] [&_li]:marker:text-zinc-500;
 }
+
+/*
+ * The Mac app. Its window has no title bar, so the toolbar moves the window, and
+ * controls behave like a Mac app's rather than a web page's.
+ */
+html[data-desktop] {
+    --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', ui-sans-serif, system-ui, sans-serif;
+}
+
+[data-desktop] .app-drag {
+    -webkit-app-region: drag;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+[data-desktop] .app-drag :is(a, button, input, select, [role='button']),
+[data-desktop] .app-no-drag {
+    -webkit-app-region: no-drag;
+}
+
+/* Mac apps use the arrow cursor for buttons and links, not the pointing hand. */
+[data-desktop] :is(a, button, label, select, summary, [role='button'], [role='menuitem'], [role='menuitemradio'], [role='option'], [role='tab'], [data-flux-button]) {
+    cursor: default !important;
+}
+
+/* Buttons and labels don't get selected by a stray drag, and links and images can't be dragged out of the window. */
+[data-desktop] :is(button, label, nav, [role='button'], [role='menuitem'], [data-flux-button], [data-flux-heading]) {
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+[data-desktop] :is(a, img) {
+    -webkit-user-drag: none;
+}

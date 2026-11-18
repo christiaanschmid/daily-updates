@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Syncs;
 use Database\Factories\DailyUpdateFactory;
 use DOMDocument;
 use DOMElement;
@@ -32,6 +33,8 @@ class DailyUpdate extends Model
 {
     /** @use HasFactory<DailyUpdateFactory> */
     use HasFactory;
+
+    use Syncs;
 
     /**
      * The sections of an update, keyed by attribute, with their display headings.
@@ -73,8 +76,15 @@ class DailyUpdate extends Model
     protected function casts(): array
     {
         return [
+            'needs_sync' => 'boolean',
+            'sync_version' => 'integer',
             'date' => 'date',
         ];
+    }
+
+    public static function syncType(): string
+    {
+        return 'daily_update';
     }
 
     /**

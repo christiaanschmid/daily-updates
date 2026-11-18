@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\DesktopLoginController;
+use App\Http\Controllers\Desktop\OpenExternalLinkController;
 use App\Livewire\Desktop\Connect;
 use App\Livewire\Updates\Huddle;
 use App\Livewire\Updates\Index;
@@ -15,6 +15,9 @@ Route::view('pay', 'pay')->name('pay');
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('dashboard', Index::class)->name('dashboard');
 
+    // Today's page, wherever "today" is when it's opened, such as from the Mac app's Go menu.
+    Route::get('today', fn () => redirect()->route('updates.show', today()->format('Y-m-d')))->name('today');
+
     Route::livewire('huddle', Huddle::class)->name('huddle');
 
     Route::livewire('updates/{date}', Show::class)
@@ -25,9 +28,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('desktop/connect/{code}', Connect::class)->name('desktop.connect');
 });
 
-// The one-time link that signs the Mac app's window in after the move.
-Route::get('desktop/login/{connection}', DesktopLoginController::class)
-    ->middleware(['signed', 'throttle:10,1'])
-    ->name('desktop.login');
+// Mac app: links to other sites open in the default browser.
+Route::post('desktop/open-external', OpenExternalLinkController::class)
+    ->middleware('auth')
+    ->name('desktop.open-external');
 
 require __DIR__.'/settings.php';

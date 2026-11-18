@@ -105,11 +105,13 @@ Do this in your Paddle sandbox first, then again in your live account. They're s
 3. **Webhooks.** Under **Events → Notifications**, add a destination for `https://your-domain/paddle/webhook` with these events: `customer.updated`, `transaction.completed`, `transaction.updated`, `subscription.created`, `subscription.updated`, `subscription.paused` and `subscription.canceled`. Copy its secret key into `PADDLE_WEBHOOK_SECRET`. Without a secret, the app refuses every webhook, because it can't tell Paddle's apart from forged ones.
 4. **Environment variables** (in Laravel Cloud, or `.env` locally): `PADDLE_SANDBOX`, `PADDLE_CLIENT_SIDE_TOKEN`, `PADDLE_API_KEY`, `PADDLE_WEBHOOK_SECRET`, `PADDLE_PRICE_MONTHLY` and `PADDLE_PRICE_YEARLY`. `.env.example` says where each one comes from. Set `PADDLE_SANDBOX=false` only with your live account's values.
 
-The app has no queued jobs or scheduled tasks, so it doesn't need a queue worker or the scheduler. The desktop app isn't affected by any of this: it always uses its own SQLite database on your Mac.
+The hosted app has no queued jobs or scheduled tasks, so it doesn't need a queue worker or the scheduler. The desktop app always uses its own SQLite database on your Mac; with [cloud sync](#cloud-sync) turned on, it syncs that database with the hosted app through its API.
 
 ## Desktop app
 
 Daily Updates also runs as a Mac app, built with [NativePHP](https://nativephp.com/docs/desktop). It's the same app in its own window, with no server to run and no login: it signs you in automatically as its one local user.
+
+It behaves like a Mac app rather than a web page: the window has no title bar, and its toolbar holds the window buttons and moves the window; links to other sites open in your default browser; and the menu bar has **Settings…** (⌘,), **Go → Today / Huddle / History** (⌘1, ⌘2, ⌘3) and **File → Sync Now**.
 
 ### Installing the app
 
@@ -160,19 +162,27 @@ The desktop app keeps its data apart from the browser version:
 - **The installed app:** `~/Library/Application Support/daily-updates/database/database.sqlite`
 - **While developing:** `database/nativephp.sqlite`
 
-### Moving to the cloud
+### Cloud sync
 
-The desktop app is free and keeps everything on your Mac. To use your logs on other devices too, go to **Settings → Plan** in the app and click **Move to cloud**. It needs an account on the hosted site with the cloud plan.
+The desktop app is free and keeps everything on your Mac. To use your logs on other devices too, go to **Settings → Cloud Sync** in the app and click **Turn on sync**. It needs an account on the hosted site with the cloud plan.
 
 1. The app opens your browser to a page on the hosted site. Sign in there and click **Connect my Mac**.
-2. The app uploads its logs and todos. A day that already has a log in the cloud keeps it, with the Mac's notes added below. Todos that are already there aren't added again.
-3. The app's window signs in to your cloud account, and from then on opens it instead of the local logs.
+2. The app sends everything on the Mac and gets everything in your account. A day that already has a log in the cloud keeps it, with the Mac's notes added below. Todos that are already there aren't added again.
+3. From then on, the app keeps working from its own database, so it's fast and works offline. It syncs a few seconds after each change, and every minute to pick up changes made elsewhere. The toolbar's cloud icon shows when it last synced, or what went wrong.
 
-Your local logs stay on the Mac. To go back to them, choose **Cloud → Use This Mac's Data Instead** from the menu bar, which relaunches the app on its own data. Anything written in the cloud in the meantime stays in the cloud.
+When the same log or todo changed in both places between syncs, nothing written is lost:
+
+- An edit beats a delete.
+- A log keeps the notes from both sides, the cloud's first.
+- A todo keeps the cloud's title, and stays checked off if either side checked it off.
+
+**Turn off sync** on the same page stops it. Everything stays on the Mac and in your account.
 
 The app connects to `https://dailyupdates.app`. To try it against another copy, such as your local one, set `DAILY_UPDATES_CLOUD_URL` in `.env` before building or running the app.
 
-How it's kept safe: the app makes up a secret that never leaves it, except to the hosted site's API, and every upload must prove it. The approval link in the browser only carries a public code, so it can't upload or sign anyone in by itself. Connections expire after 15 minutes if not approved, and the sign-in link for the app's window works once, within 5 minutes.
+How it works: every log and todo has an id that's the same on both sides. The hosted app numbers each change in an account, and the Mac remembers the last number it has, so each sync sends the Mac's unsent changes and gets back everything after that number in one request. Deletions are kept as tombstones so they reach the other side.
+
+How it's kept safe: to connect, the app makes up a secret that never leaves it, except to the hosted site's API, and every call must prove it. The approval link in the browser only carries a public code, so it can't connect anything by itself, and it expires after 15 minutes. Once approved, the app gets a sync token, which the hosted site stores only as a hash, and turning off sync makes it stop working.
 
 ### Building the app
 

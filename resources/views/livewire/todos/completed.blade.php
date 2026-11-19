@@ -4,7 +4,7 @@
 
 <div class="space-y-2.5">
     <div class="flex items-center gap-2.5">
-        <span class="rounded-md bg-teal-300/10 px-2.5 py-0.5 text-[13px] font-semibold text-teal-200">{{ __(\App\Models\DailyUpdate::COMPLETED_TODOS_HEADING) }}</span>
+        <span class="rounded-md bg-teal-600/10 dark:bg-teal-300/10 px-2.5 py-0.5 text-[13px] font-semibold text-teal-700 dark:text-teal-200">{{ __(\App\Models\DailyUpdate::COMPLETED_TODOS_HEADING) }}</span>
 
         @if ($isToday)
             <span class="text-[13px] text-zinc-500">{{ __('Uncheck one to put it back on your list') }}</span>
@@ -16,7 +16,7 @@
     @else
         <ul>
             @foreach ($this->todos as $todo)
-                <li wire:key="completed-todo-{{ $todo->id }}-{{ md5($todo->title) }}" @class(['flex items-start gap-3 rounded-xl px-4 py-1.5', 'transition-colors hover:bg-zinc-900/70 has-[input:focus]:bg-zinc-900' => $isToday])>
+                <li wire:key="completed-todo-{{ $todo->id }}-{{ md5($todo->title) }}" @class(['flex items-start gap-3 rounded-xl px-4 py-1.5', 'transition-colors hover:bg-surface has-[input:focus]:bg-surface' => $isToday])>
                     @if ($isToday)
                         <button
                             type="button"

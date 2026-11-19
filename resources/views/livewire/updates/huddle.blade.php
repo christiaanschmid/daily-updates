@@ -2,7 +2,7 @@
     <div class="space-y-3.5">
         <h1 class="text-4xl leading-tight font-semibold tracking-tight">{{ __('Huddle') }}</h1>
 
-        <p class="text-sm text-zinc-400">
+        <p class="text-sm text-ink-muted">
             @if ($this->update)
                 {{ __('From your log for :date.', ['date' => $this->update->date->format($this->update->date->isCurrentYear() ? 'l, F j' : 'l, F j, Y')]) }}
             @else
@@ -27,7 +27,7 @@
 
             <a
                 href="{{ route('updates.show', $this->update->date->format('Y-m-d')) }}"
-                class="inline-flex h-9 items-center gap-2 rounded-[10px] px-3 text-sm text-zinc-200 transition-colors hover:bg-zinc-700/60 hover:text-white"
+                class="inline-flex h-9 items-center gap-2 rounded-[10px] px-3 text-sm text-ink-soft transition-colors hover:bg-hover hover:text-ink-strong"
                 wire:navigate
             >
                 <flux:icon.pencil-square variant="micro" />
@@ -35,7 +35,7 @@
             </a>
         </div>
     @else
-        <div class="rounded-2xl border border-dashed border-zinc-700 px-6 py-14 text-center">
+        <div class="rounded-2xl border border-dashed border-line-strong px-6 py-14 text-center">
             <p class="font-semibold">{{ __('Nothing to share yet') }}</p>
         </div>
     @endif

@@ -18,7 +18,7 @@
         ['command' => "run('toggleCode')", 'active' => 'code', 'icon' => 'code-bracket', 'label' => __('Code')],
     ];
 
-    $buttonClasses = 'grid size-8 cursor-pointer place-items-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-white';
+    $buttonClasses = 'grid size-8 cursor-pointer place-items-center rounded-lg text-ink-muted transition-colors hover:bg-hover hover:text-ink-strong';
 @endphp
 
 {{--
@@ -30,15 +30,15 @@
     x-data="richEditor({ property: @js($property), label: @js($label), autofocus: @js($autofocus) })"
     wire:ignore
 >
-    <div class="hidden items-center gap-0.5 border-b border-zinc-800 px-2 py-1.5 group-focus-within:flex" role="toolbar" aria-label="{{ __('Formatting') }}">
+    <div class="hidden items-center gap-0.5 border-b border-line px-2 py-1.5 group-focus-within:flex" role="toolbar" aria-label="{{ __('Formatting') }}">
         @foreach ($buttons as $button)
             @if ($button === null)
-                <span class="mx-1 h-5 w-px bg-zinc-800" aria-hidden="true"></span>
+                <span class="mx-1 h-5 w-px bg-raised" aria-hidden="true"></span>
             @else
                 <button
                     type="button"
                     class="{{ $buttonClasses }}"
-                    x-bind:class="active.{{ $button['active'] }} && 'bg-zinc-800 text-white'"
+                    x-bind:class="active.{{ $button['active'] }} && 'bg-raised text-ink-strong'"
                     x-bind:aria-pressed="active.{{ $button['active'] }} ? 'true' : 'false'"
                     x-on:mousedown.prevent
                     x-on:click="{{ $button['command'] }}"

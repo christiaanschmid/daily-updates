@@ -2,12 +2,12 @@
     $day = \Illuminate\Support\Carbon::parse($date);
 
     $sectionStyles = [
-        'done' => ['chip' => 'bg-[#161d30] text-section-done', 'hint' => __('What you got done today')],
+        'done' => ['chip' => 'bg-raised text-section-done', 'hint' => __('What you got done today')],
         'up_next' => ['chip' => 'bg-accent/15 text-section-up-next', 'hint' => __('What you plan to do next')],
     ];
 
-    $navButton = 'grid size-9 place-items-center rounded-full border border-[#1f2840] text-zinc-400 transition-colors hover:border-zinc-600 hover:text-white';
-    $barButton = 'inline-flex h-9 cursor-pointer items-center gap-2 rounded-[10px] px-3 text-sm text-zinc-200 transition-colors hover:bg-zinc-700/60 hover:text-white';
+    $navButton = 'grid size-9 place-items-center rounded-full border border-line text-ink-muted transition-colors hover:border-line-hover hover:text-ink-strong';
+    $barButton = 'inline-flex h-9 cursor-pointer items-center gap-2 rounded-[10px] px-3 text-sm text-ink-soft transition-colors hover:bg-hover hover:text-ink-strong';
     $barPrimary = 'inline-flex h-9 cursor-pointer items-center gap-2 rounded-[10px] bg-accent px-4 text-sm font-semibold text-accent-foreground transition-opacity hover:opacity-90';
 @endphp
 
@@ -20,7 +20,7 @@
                     <flux:icon.chevron-left variant="micro" />
                 </a>
             @else
-                <span class="{{ $navButton }} pointer-events-none border-[#161d30] text-zinc-600" aria-hidden="true">
+                <span class="{{ $navButton }} pointer-events-none border-line-faint text-ink-faint" aria-hidden="true">
                     <flux:icon.chevron-left variant="micro" />
                 </span>
             @endif
@@ -32,7 +32,7 @@
                     <flux:icon.chevron-right variant="micro" />
                 </a>
             @else
-                <span class="{{ $navButton }} pointer-events-none border-[#161d30] text-zinc-600" aria-hidden="true">
+                <span class="{{ $navButton }} pointer-events-none border-line-faint text-ink-faint" aria-hidden="true">
                     <flux:icon.chevron-right variant="micro" />
                 </span>
             @endif
@@ -48,7 +48,7 @@
             {{ $day->format($day->isCurrentYear() ? 'l, F j' : 'l, F j, Y') }}
         </h1>
 
-        <p class="text-sm text-zinc-400">
+        <p class="text-sm text-ink-muted">
             @if ($editing)
                 {{ __('Edit anything; it saves as you type.') }}
             @else
@@ -59,12 +59,12 @@
 
     {{-- Hidden along with Up next: the previous day's plan, shown for reference.
     @if ($editing && filled($this->previousUpdate?->up_next))
-        <details class="mt-7 rounded-xl border border-[#1f2840] bg-[#111727] px-4 py-3">
-            <summary class="cursor-pointer text-[13px] text-zinc-400 hover:text-zinc-200">
+        <details class="mt-7 rounded-xl border border-line bg-surface px-4 py-3">
+            <summary class="cursor-pointer text-[13px] text-ink-muted hover:text-ink-soft">
                 {{ __('What you planned on :date', ['date' => $this->previousUpdate->date->format('l, F j')]) }}
             </summary>
 
-            <div class="du-prose mt-2 text-sm leading-relaxed text-zinc-300">
+            <div class="du-prose mt-2 text-sm leading-relaxed text-ink-soft">
                 {!! $this->previousUpdate->up_next !!}
             </div>
         </details>
@@ -72,9 +72,9 @@
     --}}
 
     @if ($this->locked)
-        <div class="mt-9 rounded-2xl border border-dashed border-zinc-700 px-6 py-12 text-center" data-test="history-limit-notice">
-            <p class="font-semibold text-zinc-100">{{ __('This day is outside your last :days days', ['days' => \App\Models\User::FREE_HISTORY_DAYS]) }}</p>
-            <p class="mx-auto mt-2 max-w-md text-sm text-zinc-400">
+        <div class="mt-9 rounded-2xl border border-dashed border-line-strong px-6 py-12 text-center" data-test="history-limit-notice">
+            <p class="font-semibold text-ink">{{ __('This day is outside your last :days days', ['days' => \App\Models\User::FREE_HISTORY_DAYS]) }}</p>
+            <p class="mx-auto mt-2 max-w-md text-sm text-ink-muted">
                 @if ($this->update)
                     {{ __('The free plan shows your last :days days of logs. Your log for this day is kept, and it shows again when you upgrade to the cloud plan.', ['days' => \App\Models\User::FREE_HISTORY_DAYS]) }}
                 @else
@@ -115,9 +115,9 @@
             </div>
 
             <div class="sticky bottom-0 flex justify-center pt-6 pb-6">
-                <div class="flex flex-wrap items-center gap-1 rounded-2xl border border-zinc-700 bg-zinc-800 p-1.5 shadow-[0_12px_32px_rgba(0,0,0,0.45)]">
-                    <span class="inline-flex items-center gap-1.5 px-2 text-[13px] text-zinc-400" wire:loading.remove wire:target="done,up_next">
-                        <span class="size-1.5 rounded-full bg-teal-300" aria-hidden="true"></span>
+                <div class="flex flex-wrap items-center gap-1 rounded-2xl border border-line bg-overlay p-1.5 shadow-[0_12px_32px_var(--color-shadow)]" data-action-bar>
+                    <span class="inline-flex items-center gap-1.5 px-2 text-[13px] text-ink-muted" wire:loading.remove wire:target="done,up_next">
+                        <span class="size-1.5 rounded-full bg-teal-500 dark:bg-teal-300" aria-hidden="true"></span>
                         @if ($lastSavedAt)
                             {{ __('Saved at :time', ['time' => $lastSavedAt]) }}
                         @else
@@ -125,7 +125,7 @@
                         @endif
                     </span>
 
-                    <span class="inline-flex items-center gap-1.5 px-2 text-[13px] text-zinc-400" wire:loading wire:target="done,up_next">
+                    <span class="inline-flex items-center gap-1.5 px-2 text-[13px] text-ink-muted" wire:loading wire:target="done,up_next">
                         {{ __('Saving…') }}
                     </span>
 
@@ -151,7 +151,7 @@
                     <span class="inline-block rounded-md px-2.5 py-0.5 text-[13px] font-semibold {{ $sectionStyles[$section]['chip'] ?? '' }}">{{ __($heading) }}</span>
 
                     @if (filled($this->update->{$section}))
-                        <div class="du-prose px-4 text-base leading-relaxed text-zinc-100">
+                        <div class="du-prose px-4 text-base leading-relaxed text-ink">
                             {!! $this->update->{$section} !!}
                         </div>
                     @else
@@ -166,9 +166,9 @@
         </div>
 
         <div class="sticky bottom-0 flex justify-center pt-6 pb-6">
-            <div class="flex flex-wrap items-center gap-1 rounded-2xl border border-zinc-700 bg-zinc-800 p-1.5 shadow-[0_12px_32px_rgba(0,0,0,0.45)]">
+            <div class="flex flex-wrap items-center gap-1 rounded-2xl border border-line bg-overlay p-1.5 shadow-[0_12px_32px_var(--color-shadow)]" data-action-bar>
                 <flux:modal.trigger name="confirm-update-deletion">
-                    <button type="button" class="{{ $barButton }} text-zinc-400 hover:text-red-300">
+                    <button type="button" class="{{ $barButton }} text-ink-muted hover:text-red-600 dark:hover:text-red-300">
                         <flux:icon.trash variant="micro" />
                         {{ __('Delete') }}
                     </button>

@@ -18,7 +18,7 @@
         :placeholder="__('Search your updates')"
         :aria-label="__('Search updates')"
         clearable
-        class="[&_input]:rounded-full! [&_input]:bg-zinc-900! [&_input]:border-[#1f2840]!"
+        class="[&_input]:rounded-full! [&_input]:bg-surface! [&_input]:border-line!"
     />
 
     <div>
@@ -31,7 +31,7 @@
                         @class([
                             'flex w-13 flex-col items-center rounded-xl border py-1.5 leading-tight',
                             'border-accent bg-accent text-accent-foreground' => $update->date->isToday(),
-                            'border-[#1f2840] bg-[#111727] text-zinc-100 hover:border-zinc-600' => ! $update->date->isToday(),
+                            'border-line bg-surface text-ink hover:border-line-hover' => ! $update->date->isToday(),
                         ])
                         wire:navigate
                     >
@@ -39,12 +39,12 @@
                         <span class="text-xl font-semibold">{{ $update->date->format('j') }}</span>
                     </a>
 
-                    <span class="mt-2 w-px grow bg-[#1c2438]" aria-hidden="true"></span>
+                    <span class="mt-2 w-px grow bg-line" aria-hidden="true"></span>
                 </div>
 
                 <div class="min-w-0 space-y-3.5 pb-8">
                     <div class="flex min-h-7 items-center gap-2.5">
-                        <a href="{{ route('updates.show', $update->date->format('Y-m-d')) }}" class="text-[15px] font-semibold hover:text-white" wire:navigate>
+                        <a href="{{ route('updates.show', $update->date->format('Y-m-d')) }}" class="text-[15px] font-semibold hover:text-ink-strong" wire:navigate>
                             {{ $update->date->format($update->date->isCurrentYear() ? 'l, F j' : 'l, F j, Y') }}
                         </a>
 
@@ -52,7 +52,7 @@
 
                         <button
                             type="button"
-                            class="h-8 cursor-pointer rounded-lg px-2.5 text-sm text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-white"
+                            class="h-8 cursor-pointer rounded-lg px-2.5 text-sm text-ink-muted transition-colors hover:bg-hover hover:text-ink-strong"
                             x-data="{ copied: false }"
                             x-on:click="navigator.clipboard.writeText(@js($update->toPlainText())); copied = true; setTimeout(() => copied = false, 2000)"
                         >
@@ -64,12 +64,12 @@
                 </div>
             </article>
         @empty
-            <div class="rounded-2xl border border-dashed border-zinc-700 px-6 py-14 text-center">
+            <div class="rounded-2xl border border-dashed border-line-strong px-6 py-14 text-center">
                 @if (filled($search))
-                    <p class="text-sm text-zinc-400">{{ __('No updates match ":search".', ['search' => $search]) }}</p>
+                    <p class="text-sm text-ink-muted">{{ __('No updates match ":search".', ['search' => $search]) }}</p>
                 @else
                     <p class="font-semibold">{{ __('No updates yet') }}</p>
-                    <p class="mt-1 text-sm text-zinc-400">{{ __("Start today's update to begin your history.") }}</p>
+                    <p class="mt-1 text-sm text-ink-muted">{{ __("Start today's update to begin your history.") }}</p>
                 @endif
             </div>
         @endforelse
@@ -78,7 +78,7 @@
     <flux:pagination :paginator="$this->updates" />
 
     @if ($this->hiddenUpdatesCount > 0)
-        <p class="rounded-xl border border-[#1f2840] bg-[#111727] px-4 py-3 text-sm text-zinc-400" data-test="history-limit-notice">
+        <p class="rounded-xl border border-line bg-surface px-4 py-3 text-sm text-ink-muted" data-test="history-limit-notice">
             {{ trans_choice(
                 '{1} The free plan shows your last :days days. :count older log is kept, and shows again when you upgrade to the cloud plan.|[2,*] The free plan shows your last :days days. :count older logs are kept, and show again when you upgrade to the cloud plan.',
                 $this->hiddenUpdatesCount,

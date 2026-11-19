@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark" @desktop data-desktop @enddesktop>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @desktop data-desktop @enddesktop>
     <head>
         @include('partials.head')
     </head>
-    <body class="min-h-screen bg-zinc-950 text-zinc-100 antialiased">
+    <body class="min-h-screen bg-canvas text-ink antialiased">
         @php
             $todayDate = today()->format('Y-m-d');
             $onToday = request()->routeIs('updates.show') && request()->route('date') === $todayDate;
@@ -20,21 +20,21 @@
                 Only its empty parts move the window. A button inside a dragging area can lose its clicks
                 to the window drag, so no button sits inside one.
             --}}
-            <header class="sticky top-0 z-30 border-b border-[#1a2133] bg-zinc-950/85 backdrop-blur-xl select-none">
+            <header class="sticky top-0 z-30 border-b border-line bg-canvas/85 backdrop-blur-xl select-none">
                 {{-- Three columns, so the centered nav can never cover the buttons on the right, however narrow the window. --}}
                 <div class="grid h-13 grid-cols-[1fr_auto_1fr] items-center">
                     {{-- Starts after the window buttons, which macOS draws over this corner. --}}
                     <span class="app-drag ms-20 self-stretch"></span>
 
-                    <nav aria-label="{{ __('Main') }}" class="mx-2 flex gap-0.5 rounded-lg bg-[#131a2b] p-0.5">
+                    <nav aria-label="{{ __('Main') }}" class="mx-2 flex gap-0.5 rounded-lg bg-raised p-0.5">
                         @foreach ($navItems as $item)
                             <a
                                 href="{{ $item['href'] }}"
                                 @if ($item['current']) aria-current="page" @endif
                                 @class([
                                     'flex h-7 items-center rounded-md px-3 text-[13px] transition-colors',
-                                    'bg-[#26304a] font-medium text-white shadow-sm' => $item['current'],
-                                    'text-zinc-400 hover:text-zinc-100' => ! $item['current'],
+                                    'bg-raised-strong font-medium text-ink-strong shadow-sm' => $item['current'],
+                                    'text-ink-muted hover:text-ink' => ! $item['current'],
                                 ])
                                 wire:navigate
                             >
@@ -50,7 +50,7 @@
 
                         <a
                             href="{{ route('profile.edit') }}"
-                            class="grid size-8 place-items-center rounded-md text-zinc-400 transition-colors hover:bg-[#131a2b] hover:text-zinc-100"
+                            class="grid size-8 place-items-center rounded-md text-ink-muted transition-colors hover:bg-hover hover:text-ink"
                             aria-label="{{ __('Settings') }}"
                             wire:navigate
                         >
@@ -60,7 +60,7 @@
                 </div>
             </header>
         @else
-            <header class="border-b border-[#1a2133]">
+            <header class="border-b border-line">
                 <div class="mx-auto flex min-h-16 w-full max-w-5xl flex-wrap items-center gap-x-6 gap-y-2 px-6">
                     <a href="{{ route('dashboard') }}" class="flex items-center gap-2.5" wire:navigate>
                         <x-app-logo-icon class="size-7" />
@@ -74,8 +74,8 @@
                                 @if ($item['current']) aria-current="page" @endif
                                 @class([
                                     'flex h-9 items-center rounded-full px-3 text-sm transition-colors',
-                                    'bg-[#161d30] font-medium text-white' => $item['current'],
-                                    'text-zinc-400 hover:text-white' => ! $item['current'],
+                                    'bg-raised font-medium text-ink-strong' => $item['current'],
+                                    'text-ink-muted hover:text-ink-strong' => ! $item['current'],
                                 ])
                                 wire:navigate
                             >
@@ -94,9 +94,7 @@
         {{ $slot }}
 
         @persist('toast')
-            <flux:toast.group>
-                <flux:toast />
-            </flux:toast.group>
+            <flux:toast />
         @endpersist
 
         @fluxScripts

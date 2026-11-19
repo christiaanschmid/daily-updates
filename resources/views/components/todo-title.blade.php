@@ -41,7 +41,7 @@
             role="button"
             tabindex="0"
             aria-label="{{ __('Edit :title', ['title' => $todo->title]) }}"
-            class="du-prose block cursor-text text-base leading-relaxed break-words text-zinc-100"
+            class="du-prose block cursor-text text-base leading-relaxed break-words text-ink"
         >{{ $todo->titleHtml() }}</span>
 
         <input
@@ -55,9 +55,9 @@
             x-on:blur="save()"
             maxlength="{{ \App\Models\Todo::MAX_TITLE_LENGTH }}"
             aria-label="{{ __('Todo title') }}"
-            class="block w-full border-0 bg-transparent p-0 text-base leading-relaxed text-zinc-100 focus:ring-0 focus:outline-none"
+            class="block w-full border-0 bg-transparent p-0 text-base leading-relaxed text-ink focus:ring-0 focus:outline-none"
         />
     @else
-        <span class="du-prose block text-base leading-relaxed break-words text-zinc-100">{{ $todo->titleHtml() }}</span>
+        <span class="du-prose block text-base leading-relaxed break-words text-ink">{{ $todo->titleHtml() }}</span>
     @endif
 </div>

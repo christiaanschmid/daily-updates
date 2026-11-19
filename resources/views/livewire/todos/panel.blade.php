@@ -5,7 +5,7 @@
 
 <div class="space-y-2.5">
     <div class="flex items-center gap-2.5">
-        <span class="rounded-md bg-teal-300/10 px-2.5 py-0.5 text-[13px] font-semibold text-teal-200">{{ __('Todos') }}</span>
+        <span class="rounded-md bg-teal-600/10 dark:bg-teal-300/10 px-2.5 py-0.5 text-[13px] font-semibold text-teal-700 dark:text-teal-200">{{ __('Todos') }}</span>
         <span class="text-[13px] text-zinc-500">{{ __('Check one off when it’s done') }}</span>
 
         @if ($this->openTodos->isNotEmpty())
@@ -15,11 +15,11 @@
 
     <ul>
         @foreach ($this->openTodos as $todo)
-            <li wire:key="todo-{{ $todo->id }}-{{ md5($todo->title) }}" class="group {{ $row }} transition-colors hover:bg-zinc-900/70 has-[input:focus]:bg-zinc-900">
+            <li wire:key="todo-{{ $todo->id }}-{{ md5($todo->title) }}" class="group {{ $row }} transition-colors hover:bg-surface has-[input:focus]:bg-surface">
                 <button
                     type="button"
                     wire:click="complete({{ $todo->id }})"
-                    class="{{ $checkbox }} cursor-pointer border-zinc-600 text-transparent transition-colors hover:border-accent hover:text-accent"
+                    class="{{ $checkbox }} cursor-pointer border-line-hover text-transparent transition-colors hover:border-accent hover:text-accent"
                     aria-label="{{ __('Check off :title', ['title' => $todo->title]) }}"
                 >
                     <flux:icon.check variant="micro" class="size-3.5" />
@@ -30,7 +30,7 @@
                 <button
                     type="button"
                     wire:click="delete({{ $todo->id }})"
-                    class="mt-[5px] shrink-0 cursor-pointer text-zinc-600 opacity-0 transition-opacity group-hover:opacity-100 hover:text-red-300 focus:opacity-100"
+                    class="mt-[5px] shrink-0 cursor-pointer text-ink-faint opacity-0 transition-opacity group-hover:opacity-100 hover:text-red-600 dark:hover:text-red-300 focus:opacity-100"
                     aria-label="{{ __('Delete :title', ['title' => $todo->title]) }}"
                 >
                     <flux:icon.x-mark variant="micro" />
@@ -38,8 +38,8 @@
             </li>
         @endforeach
 
-        <li class="{{ $row }} transition-colors focus-within:bg-zinc-900 hover:bg-zinc-900/70">
-            <span class="{{ $checkbox }} border-dashed border-zinc-700 text-zinc-600" aria-hidden="true">
+        <li class="{{ $row }} transition-colors focus-within:bg-surface hover:bg-surface">
+            <span class="{{ $checkbox }} border-dashed border-line-strong text-ink-faint" aria-hidden="true">
                 <flux:icon.plus variant="micro" class="size-3" />
             </span>
 
@@ -50,13 +50,13 @@
                     placeholder="{{ __('Add a todo…') }}"
                     aria-label="{{ __('New todo') }}"
                     maxlength="{{ \App\Models\Todo::MAX_TITLE_LENGTH }}"
-                    class="w-full border-0 bg-transparent p-0 text-base leading-relaxed text-zinc-100 placeholder:text-zinc-500 focus:ring-0 focus:outline-none"
+                    class="w-full border-0 bg-transparent p-0 text-base leading-relaxed text-ink placeholder:text-zinc-500 focus:ring-0 focus:outline-none"
                 />
             </form>
         </li>
     </ul>
 
     @error('title')
-        <p class="px-4 text-[13px] text-red-300">{{ $message }}</p>
+        <p class="px-4 text-[13px] text-red-600 dark:text-red-300">{{ $message }}</p>
     @enderror
 </div>

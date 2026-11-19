@@ -25,17 +25,60 @@
     --color-zinc-900: #0f1424;
     --color-zinc-950: #0b0f1a;
 
-    /* Section colors for an update. */
-    --color-section-done: #aeb6c9;
-    --color-section-up-next: #b9c6ff;
+    /*
+     * App colors. These are the light theme; `.dark` below swaps in the dark values, so
+     * views use one class (text-ink, bg-surface, border-line, ...) that works in both.
+     */
+    --color-canvas: #ffffff;
+    --color-surface: #f5f7fb;
+    --color-raised: #eceff6;
+    --color-raised-strong: #ffffff;
+    --color-overlay: #ffffff;
+    --color-hover: #e6e9f2;
+    --color-line: #dfe3ed;
+    --color-line-faint: #eceff6;
+    --color-line-strong: #c9cfdd;
+    --color-line-hover: #aeb6c9;
+    --color-focus-line: #b9c6ff;
+    --color-ink-strong: #0b0f1a;
+    --color-ink: #131a2b;
+    --color-ink-soft: #26304a;
+    --color-ink-muted: #4a5574;
+    --color-ink-faint: #aeb6c9;
+    --color-shadow: rgb(15 20 36 / 0.12);
 
-    --color-accent: #8ea2ff;
-    --color-accent-content: #b9c6ff;
-    --color-accent-foreground: #0b0f1a;
+    /* Section colors for an update. */
+    --color-section-done: #4a5574;
+    --color-section-up-next: #3b4cc0;
+
+    --color-accent: #4c5fd5;
+    --color-accent-content: #3b4cc0;
+    --color-accent-foreground: #ffffff;
 }
 
 @layer theme {
     .dark {
+        --color-canvas: #0b0f1a;
+        --color-surface: #111727;
+        --color-raised: #161d30;
+        --color-raised-strong: #26304a;
+        --color-overlay: #131a2b;
+        --color-hover: rgb(38 48 74 / 0.6);
+        --color-line: #1f2840;
+        --color-line-faint: #161d30;
+        --color-line-strong: #26304a;
+        --color-line-hover: #4a5574;
+        --color-focus-line: #2c3a66;
+        --color-ink-strong: #ffffff;
+        --color-ink: #e6e9f2;
+        --color-ink-soft: #c9cfdd;
+        --color-ink-muted: #9aa3b8;
+        --color-ink-faint: #4a5574;
+        --color-shadow: rgb(0 0 0 / 0.45);
+
+        --color-section-done: #aeb6c9;
+        --color-section-up-next: #b9c6ff;
+
         --color-accent: #8ea2ff;
         --color-accent-content: #b9c6ff;
         --color-accent-foreground: #0b0f1a;
@@ -63,11 +106,11 @@
     /* A thin, theme-colored scrollbar for the page and every scrolling panel. */
     * {
         scrollbar-width: thin;
-        scrollbar-color: var(--color-zinc-700) transparent;
+        scrollbar-color: var(--color-line-strong) transparent;
     }
 
     *:hover {
-        scrollbar-color: var(--color-zinc-600) transparent;
+        scrollbar-color: var(--color-line-hover) transparent;
     }
 }
 
@@ -95,15 +138,15 @@ select:focus[data-flux-control] {
 }
 
 .du-editor:hover {
-    @apply border-zinc-800;
+    @apply border-line;
 }
 
 .du-editor:focus-within {
-    @apply border-[#2c3a66] bg-zinc-900;
+    @apply border-focus-line bg-surface;
 }
 
 .du-editor-content {
-    @apply min-h-24 px-4 py-3 text-base leading-relaxed text-zinc-100 outline-none;
+    @apply min-h-24 px-4 py-3 text-base leading-relaxed text-ink outline-none;
 }
 
 .du-editor-content li > ul,
@@ -113,7 +156,20 @@ select:focus[data-flux-control] {
 
 /* Saved update HTML, shown outside the editor. */
 .du-prose {
-    @apply [&_a]:text-accent-content [&_a]:underline [&_blockquote]:border-s-2 [&_blockquote]:border-zinc-700 [&_blockquote]:ps-3 [&_code]:rounded [&_code]:bg-white/10 [&_code]:px-1 [&_code]:font-mono [&_code]:text-[0.9em] [&_li]:my-0.5 [&_li>p]:my-0 [&_ol]:list-decimal [&_ol]:ps-5 [&_p]:my-1 [&_ul]:list-disc [&_ul]:ps-5 [&_ul_ul]:list-[circle] [&_ul_ul_ul]:list-[square] [&_li]:marker:text-zinc-500;
+    @apply [&_a]:text-accent-content [&_a]:underline [&_blockquote]:border-s-2 [&_blockquote]:border-line-strong [&_blockquote]:ps-3 [&_code]:rounded [&_code]:bg-raised [&_code]:px-1 [&_code]:font-mono [&_code]:text-[0.9em] [&_li]:my-0.5 [&_li>p]:my-0 [&_ol]:list-decimal [&_ol]:ps-5 [&_p]:my-1 [&_ul]:list-disc [&_ul]:ps-5 [&_ul_ul]:list-[circle] [&_ul_ul_ul]:list-[square] [&_li]:marker:text-zinc-500;
+}
+
+/*
+ * Toasts: a pill at the bottom center. On a page with a floating action bar (the day view),
+ * it sits above the bar instead of covering it.
+ */
+ui-toast.du-toast {
+    max-width: none;
+    margin-bottom: 1.5rem;
+}
+
+body:has([data-action-bar]) ui-toast.du-toast {
+    margin-bottom: 7rem;
 }
 
 /*

@@ -1,7 +1,7 @@
 <flux:dropdown position="bottom" align="end" {{ $attributes }}>
     <button
         type="button"
-        class="grid size-9 cursor-pointer place-items-center rounded-full border border-zinc-700 bg-zinc-800 text-xs font-semibold text-zinc-100 transition-colors hover:border-zinc-600"
+        class="grid size-9 cursor-pointer place-items-center rounded-full border border-line-strong bg-raised text-xs font-semibold text-ink transition-colors hover:border-line-hover"
         aria-label="{{ __('Account menu') }}"
         data-test="sidebar-menu-button"
     >

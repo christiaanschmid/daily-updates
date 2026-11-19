@@ -4,7 +4,7 @@
 ])
 
 @php
-    $arrowButton = 'grid size-8 cursor-pointer place-items-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-white';
+    $arrowButton = 'grid size-8 cursor-pointer place-items-center rounded-lg text-ink-muted transition-colors hover:bg-hover hover:text-ink-strong';
 @endphp
 
 {{--
@@ -23,8 +23,8 @@
         x-bind:aria-expanded="open ? 'true' : 'false'"
         aria-haspopup="dialog"
         aria-label="{{ $label }}"
-        class="inline-flex h-9 w-44 cursor-pointer items-center justify-center gap-2 rounded-full border border-[#1f2840] bg-zinc-900 px-4 font-mono text-sm text-zinc-200 transition-colors hover:border-zinc-600 hover:text-white"
-        x-bind:class="open && 'border-zinc-600 text-white'"
+        class="inline-flex h-9 w-44 cursor-pointer items-center justify-center gap-2 rounded-full border border-line bg-surface px-4 font-mono text-sm text-ink-soft transition-colors hover:border-line-hover hover:text-ink-strong"
+        x-bind:class="open && 'border-line-hover text-ink-strong'"
     >
         <flux:icon.calendar variant="micro" class="text-zinc-500" />
         <span x-text="label"></span>
@@ -37,10 +37,10 @@
         x-transition.origin.top.duration.100ms
         role="dialog"
         aria-label="{{ __('Choose a date') }}"
-        class="absolute top-full left-1/2 z-30 mt-2 w-[284px] -translate-x-1/2 rounded-2xl border border-[#1f2840] bg-[#111727] p-3 shadow-[0_16px_40px_rgba(0,0,0,0.5)]"
+        class="absolute top-full left-1/2 z-30 mt-2 w-[284px] -translate-x-1/2 rounded-2xl border border-line bg-surface p-3 shadow-[0_16px_40px_var(--color-shadow)]"
     >
         <div class="mb-2 flex items-center justify-between ps-2">
-            <span class="text-sm font-semibold text-white" x-text="monthLabel"></span>
+            <span class="text-sm font-semibold text-ink-strong" x-text="monthLabel"></span>
 
             <div class="flex items-center gap-0.5">
                 <button type="button" class="{{ $arrowButton }}" x-on:click="shiftMonth(-1)" aria-label="{{ __('Previous month') }}">
@@ -68,19 +68,19 @@
                     x-bind:class="{
                         'bg-accent font-semibold text-accent-foreground hover:bg-accent': day.iso === selected,
                         'ring-1 ring-inset ring-accent/60 text-accent-content': day.iso === today && day.iso !== selected,
-                        'text-zinc-200': day.inMonth && day.iso !== selected && day.iso !== today,
-                        'text-zinc-600': ! day.inMonth && day.iso !== selected,
+                        'text-ink-soft': day.inMonth && day.iso !== selected && day.iso !== today,
+                        'text-ink-faint': ! day.inMonth && day.iso !== selected,
                     }"
-                    class="grid h-9 cursor-pointer place-items-center rounded-lg font-mono text-[13px] transition-colors hover:bg-zinc-800"
+                    class="grid h-9 cursor-pointer place-items-center rounded-lg font-mono text-[13px] transition-colors hover:bg-hover"
                     x-text="day.day"
                 ></button>
             </template>
         </div>
 
-        <div class="mt-2 flex justify-end border-t border-[#1f2840] pt-2">
+        <div class="mt-2 flex justify-end border-t border-line pt-2">
             <button
                 type="button"
-                class="cursor-pointer rounded-lg px-2.5 py-1 text-[13px] text-accent-content transition-colors hover:bg-zinc-800"
+                class="cursor-pointer rounded-lg px-2.5 py-1 text-[13px] text-accent-content transition-colors hover:bg-hover"
                 x-on:click="pick(today)"
             >
                 {{ __('Today') }}

@@ -12,13 +12,13 @@
         <flux:tooltip :content="$label" position="bottom">
             <a
                 href="{{ route('plan.edit') }}"
-                class="grid size-8 place-items-center rounded-md text-zinc-400 transition-colors hover:bg-[#131a2b] hover:text-zinc-100"
+                class="grid size-8 place-items-center rounded-md text-ink-muted transition-colors hover:bg-hover hover:text-ink"
                 aria-label="{{ $label }}"
                 data-test="sync-status"
                 wire:navigate
             >
                 @if (filled($link->last_error))
-                    <flux:icon.exclamation-triangle variant="outline" class="size-[18px] text-amber-300" />
+                    <flux:icon.exclamation-triangle variant="outline" class="size-[18px] text-amber-600 dark:text-amber-300" />
                 @else
                     <flux:icon.cloud variant="outline" class="size-[18px]" />
                 @endif

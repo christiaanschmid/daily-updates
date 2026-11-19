@@ -7,7 +7,7 @@
 
 @php
     $chipClasses = [
-        'done' => 'bg-[#161d30] text-section-done',
+        'done' => 'bg-raised text-section-done',
         'up_next' => 'bg-accent/15 text-section-up-next',
     ];
 @endphp
@@ -18,7 +18,7 @@
             <span class="justify-self-start rounded-md whitespace-nowrap px-2 py-0.5 text-xs font-medium {{ $chipClasses[$section] ?? '' }}">{{ __($heading) }}</span>
 
             @if (filled($update->{$section}))
-                <div class="du-prose text-sm leading-relaxed text-zinc-200 [&_mark]:rounded-sm [&_mark]:bg-yellow-300 [&_mark]:px-0.5 [&_mark]:text-zinc-950">
+                <div class="du-prose text-sm leading-relaxed text-ink-soft [&_mark]:rounded-sm [&_mark]:bg-yellow-300 [&_mark]:px-0.5 [&_mark]:text-zinc-950">
                     {!! $update->highlighted($section, $highlight) !!}
                 </div>
             @else
@@ -29,9 +29,9 @@
 
     @if ($completedTodos?->isNotEmpty())
         <div class="col-span-2 grid grid-cols-subgrid items-baseline">
-            <span class="justify-self-start rounded-md whitespace-nowrap bg-teal-300/10 px-2 py-0.5 text-xs font-medium text-teal-200">{{ __(\App\Models\DailyUpdate::COMPLETED_TODOS_HEADING) }}</span>
+            <span class="justify-self-start rounded-md whitespace-nowrap bg-teal-600/10 dark:bg-teal-300/10 px-2 py-0.5 text-xs font-medium text-teal-700 dark:text-teal-200">{{ __(\App\Models\DailyUpdate::COMPLETED_TODOS_HEADING) }}</span>
 
-            <div class="du-prose text-sm leading-relaxed text-zinc-200">
+            <div class="du-prose text-sm leading-relaxed text-ink-soft">
                 <ul>
                     @foreach ($completedTodos as $todo)
                         <li>{{ $todo->titleHtml() }}</li>

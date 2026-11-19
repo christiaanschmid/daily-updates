@@ -1,5 +1,5 @@
 @php
-    $card = 'rounded-2xl border border-[#1f2840] bg-[#111727] p-5';
+    $card = 'rounded-2xl border border-line bg-surface p-5';
     $link = $this->cloudLink;
 @endphp
 
@@ -15,12 +15,12 @@
         <div class="space-y-6">
             @if ($link)
                 <div class="{{ $card }}" data-test="sync-on">
-                    <p class="font-semibold text-zinc-100">{{ __('Sync is on') }}</p>
-                    <p class="mt-1 text-sm text-zinc-400">
+                    <p class="font-semibold text-ink">{{ __('Sync is on') }}</p>
+                    <p class="mt-1 text-sm text-ink-muted">
                         {{ __('Your logs and todos are on this Mac and in your account on :host. Changes you make here or on the web show up in both places, even after you\'ve been offline.', ['host' => $link->host()]) }}
                     </p>
 
-                    <p class="mt-3 text-sm text-zinc-400" data-test="last-synced">
+                    <p class="mt-3 text-sm text-ink-muted" data-test="last-synced">
                         @if ($link->last_synced_at)
                             {{ __('Last synced :time.', ['time' => $link->last_synced_at->diffForHumans()]) }}
                         @else
@@ -29,7 +29,7 @@
                     </p>
 
                     @if (filled($link->last_error))
-                        <p class="mt-2 text-sm text-red-300" data-test="sync-error">{{ $link->last_error }}</p>
+                        <p class="mt-2 text-sm text-red-600 dark:text-red-300" data-test="sync-error">{{ $link->last_error }}</p>
                     @endif
 
                     <div class="mt-4 flex flex-wrap gap-2">
@@ -55,8 +55,8 @@
             @elseif ($connectStatus === 'waiting')
                 {{-- Checks every few seconds whether the user approved the connection in their browser. --}}
                 <div class="{{ $card }}" wire:poll.2s="checkConnection" data-test="connect-waiting">
-                    <p class="font-semibold text-zinc-100">{{ __('Approve in your browser') }}</p>
-                    <p class="mt-1 text-sm text-zinc-400">
+                    <p class="font-semibold text-ink">{{ __('Approve in your browser') }}</p>
+                    <p class="mt-1 text-sm text-ink-muted">
                         {{ __('Sign in to :host in the browser window that just opened and click Connect my Mac. This page continues by itself once you do.', ['host' => $cloudHost]) }}
                     </p>
                     <div class="mt-4 flex flex-wrap gap-2">
@@ -66,16 +66,16 @@
                 </div>
             @else
                 <div class="{{ $card }}" data-test="sync-off">
-                    <p class="font-semibold text-zinc-100">{{ __('Use your logs on any device') }}</p>
-                    <p class="mt-1 text-sm text-zinc-400">
+                    <p class="font-semibold text-ink">{{ __('Use your logs on any device') }}</p>
+                    <p class="mt-1 text-sm text-ink-muted">
                         {{ __('Sync this Mac with your account on :host to see and write your logs on the web and on other computers too. The app keeps working offline and catches up when you\'re back online. This needs the cloud plan, which has a free trial.', ['host' => $cloudHost]) }}
                     </p>
-                    <p class="mt-2 text-sm text-zinc-400">
+                    <p class="mt-2 text-sm text-ink-muted">
                         {{ __('Logs already in your account are combined with this Mac\'s: a day logged in both places keeps both sets of notes.') }}
                     </p>
 
                     @if (filled($connectStatus))
-                        <p class="mt-3 text-sm text-red-300" data-test="connect-error">{{ $connectStatus }}</p>
+                        <p class="mt-3 text-sm text-red-600 dark:text-red-300" data-test="connect-error">{{ $connectStatus }}</p>
                     @endif
 
                     <flux:button class="mt-4" variant="primary" wire:click="turnOnSync" data-test="turn-on-sync">{{ __('Turn on sync') }}</flux:button>

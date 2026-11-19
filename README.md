@@ -145,7 +145,7 @@ node vendor/nativephp/desktop/resources/electron/node_modules/electron/install.j
 php artisan native:migrate
 ```
 
-The first installs NativePHP's Electron shell and a PHP binary for the app. The second downloads Electron itself: NativePHP looks for Electron before starting it, and Electron 45 no longer downloads itself when installed, so this step is needed on every fresh clone. The third creates the development database.
+The first installs NativePHP's Electron shell and a PHP binary for the app. The second downloads Electron itself: NativePHP looks for Electron before starting it, and Electron 45 no longer downloads itself when installed. Building the app (`composer desktop:install` or `php artisan native:build`) reinstalls the shell and deletes that download, so `composer native:dev` downloads it again first whenever it's missing. The third creates the development database.
 
 Then start the app:
 

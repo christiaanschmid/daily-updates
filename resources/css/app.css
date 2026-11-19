@@ -51,6 +51,24 @@
     ::file-selector-button {
         border-color: var(--color-gray-200, currentColor);
     }
+
+    /*
+     * Always reserve the scrollbar's lane, so content doesn't jump sideways when a page
+     * becomes tall enough to scroll. The empty lane takes the page background.
+     */
+    html {
+        scrollbar-gutter: stable;
+    }
+
+    /* A thin, theme-colored scrollbar for the page and every scrolling panel. */
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: var(--color-zinc-700) transparent;
+    }
+
+    *:hover {
+        scrollbar-color: var(--color-zinc-600) transparent;
+    }
 }
 
 [data-flux-field]:not(ui-radio, ui-checkbox) {

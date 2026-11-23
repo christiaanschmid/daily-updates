@@ -12,6 +12,18 @@
                 </a>
 
                 <div class="flex items-center gap-2">
+                    {{-- Uses the same appearance setting as Settings, so the choice carries over after signing in. --}}
+                    <button
+                        type="button"
+                        x-data
+                        x-on:click="$flux.appearance = $flux.dark ? 'light' : 'dark'"
+                        x-bind:aria-label="$flux.dark ? '{{ __('Switch to light mode') }}' : '{{ __('Switch to dark mode') }}'"
+                        aria-label="{{ __('Switch between light and dark mode') }}"
+                        class="inline-flex size-11 items-center justify-center rounded-lg text-ink-muted hover:bg-hover hover:text-ink"
+                    >
+                        <flux:icon.moon variant="outline" class="size-5 dark:hidden" />
+                        <flux:icon.sun variant="outline" class="hidden size-5 dark:block" />
+                    </button>
                     <a href="{{ route('login') }}" class="inline-flex min-h-11 items-center rounded-lg px-3.5 text-[15px] font-medium text-ink-soft hover:bg-hover">
                         {{ __('Log in') }}
                     </a>

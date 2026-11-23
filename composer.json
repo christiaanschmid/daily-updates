@@ -103,6 +103,10 @@
             "Composer\\Config::disableProcessTimeout",
             "bash scripts/install-desktop-app.sh"
         ],
+        "desktop:release": [
+            "Composer\\Config::disableProcessTimeout",
+            "bash scripts/release-desktop-app.sh"
+        ],
         "native:dev": [
             "Composer\\Config::disableProcessTimeout",
             "node vendor/nativephp/desktop/resources/electron/node_modules/electron/install.js",

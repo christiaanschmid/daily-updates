@@ -20,6 +20,9 @@ beforeEach(function () {
         'services.paddle.prices.monthly' => MONTHLY_PRICE,
         'services.paddle.prices.yearly' => YEARLY_PRICE,
         'cashier.client_side_token' => 'test_clientsidetoken000000000000',
+        // Cashier refuses to call the API without a key, even when the call is
+        // faked. A placeholder keeps the tests from depending on a real key in .env.
+        'cashier.api_key' => 'pdl_sdbx_apikey_placeholder_for_tests',
         'cashier.sandbox' => true,
     ]);
 });

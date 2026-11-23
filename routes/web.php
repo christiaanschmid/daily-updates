@@ -5,9 +5,18 @@ use App\Livewire\Desktop\Connect;
 use App\Livewire\Updates\Huddle;
 use App\Livewire\Updates\Index;
 use App\Livewire\Updates\Show;
+use App\Support\Desktop;
 use Illuminate\Support\Facades\Route;
 
-Route::redirect('/', '/dashboard')->name('home');
+// Guests on the web see the home page. Signed-in users, and the Mac app, which has no
+// need for one, go straight to their updates.
+Route::get('/', function () {
+    if (Desktop::running() || auth()->check()) {
+        return redirect()->route('dashboard');
+    }
+
+    return view('welcome');
+})->name('home');
 
 // Paddle's default payment link: it opens checkouts for payments and payment method updates.
 Route::view('pay', 'pay')->name('pay');

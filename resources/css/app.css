@@ -147,6 +147,8 @@ select:focus[data-flux-control] {
 
 .du-editor-content {
     @apply min-h-24 px-4 py-3 text-base leading-relaxed text-ink outline-none;
+    /* Long unbroken text (a pasted URL) wraps instead of widening the page. */
+    overflow-wrap: anywhere;
 }
 
 .du-editor-content li > ul,
@@ -157,6 +159,8 @@ select:focus[data-flux-control] {
 /* Saved update HTML, shown outside the editor. */
 .du-prose {
     @apply [&_a]:text-accent-content [&_a]:underline [&_blockquote]:border-s-2 [&_blockquote]:border-line-strong [&_blockquote]:ps-3 [&_code]:rounded [&_code]:bg-raised [&_code]:px-1 [&_code]:font-mono [&_code]:text-[0.9em] [&_li]:my-0.5 [&_li>p]:my-0 [&_ol]:list-decimal [&_ol]:ps-5 [&_p]:my-1 [&_ul]:list-disc [&_ul]:ps-5 [&_ul_ul]:list-[circle] [&_ul_ul_ul]:list-[square] [&_li]:marker:text-zinc-500;
+    /* Long unbroken text (a pasted URL) wraps instead of widening the page. */
+    overflow-wrap: anywhere;
 }
 
 /*

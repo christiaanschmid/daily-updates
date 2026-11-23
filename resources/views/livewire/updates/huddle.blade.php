@@ -1,6 +1,6 @@
 <section class="mx-auto w-full max-w-[720px] space-y-8">
     <div class="space-y-3.5">
-        <h1 class="text-4xl leading-tight font-semibold tracking-tight">{{ __('Huddle') }}</h1>
+        <h1 class="text-3xl leading-tight font-semibold tracking-tight sm:text-4xl">{{ __('Huddle') }}</h1>
 
         <p class="text-sm text-ink-muted">
             @if ($this->update)
@@ -17,7 +17,7 @@
         <div class="flex flex-wrap items-center gap-2">
             <button
                 type="button"
-                class="inline-flex h-9 cursor-pointer items-center gap-2 rounded-[10px] bg-accent px-4 text-sm font-semibold text-accent-foreground transition-opacity hover:opacity-90"
+                class="inline-flex h-10 cursor-pointer items-center gap-2 rounded-[10px] bg-accent sm:h-9 px-4 text-sm font-semibold text-accent-foreground transition-opacity hover:opacity-90"
                 x-data="{ copied: false }"
                 x-on:click="navigator.clipboard.writeText(@js($this->update->toHuddleText())); copied = true; setTimeout(() => copied = false, 2000)"
             >
@@ -27,7 +27,7 @@
 
             <a
                 href="{{ route('updates.show', $this->update->date->format('Y-m-d')) }}"
-                class="inline-flex h-9 items-center gap-2 rounded-[10px] px-3 text-sm text-ink-soft transition-colors hover:bg-hover hover:text-ink-strong"
+                class="inline-flex h-10 items-center gap-2 rounded-[10px] px-3 sm:h-9 text-sm text-ink-soft transition-colors hover:bg-hover hover:text-ink-strong"
                 wire:navigate
             >
                 <flux:icon.pencil-square variant="micro" />

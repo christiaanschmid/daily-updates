@@ -4,7 +4,7 @@
 ])
 
 @php
-    $arrowButton = 'grid size-8 cursor-pointer place-items-center rounded-lg text-ink-muted transition-colors hover:bg-hover hover:text-ink-strong';
+    $arrowButton = 'grid size-10 cursor-pointer place-items-center rounded-lg text-ink-muted transition-colors hover:bg-hover hover:text-ink-strong sm:size-8';
 @endphp
 
 {{--
@@ -23,7 +23,7 @@
         x-bind:aria-expanded="open ? 'true' : 'false'"
         aria-haspopup="dialog"
         aria-label="{{ $label }}"
-        class="inline-flex h-9 w-44 cursor-pointer items-center justify-center gap-2 rounded-full border border-line bg-surface px-4 font-mono text-sm text-ink-soft transition-colors hover:border-line-hover hover:text-ink-strong"
+        class="inline-flex h-10 w-44 cursor-pointer sm:h-9 items-center justify-center gap-2 rounded-full border border-line bg-surface px-4 font-mono text-sm text-ink-soft transition-colors hover:border-line-hover hover:text-ink-strong"
         x-bind:class="open && 'border-line-hover text-ink-strong'"
     >
         <flux:icon.calendar variant="micro" class="text-zinc-500" />
@@ -80,7 +80,7 @@
         <div class="mt-2 flex justify-end border-t border-line pt-2">
             <button
                 type="button"
-                class="cursor-pointer rounded-lg px-2.5 py-1 text-[13px] text-accent-content transition-colors hover:bg-hover"
+                class="min-h-10 cursor-pointer rounded-lg px-2.5 py-1 text-[13px] sm:min-h-0 text-accent-content transition-colors hover:bg-hover"
                 x-on:click="pick(today)"
             >
                 {{ __('Today') }}

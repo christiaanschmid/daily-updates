@@ -1,11 +1,13 @@
 @php
     $row = 'flex items-start gap-3 rounded-xl px-4 py-1.5';
     $checkbox = 'mt-[5px] grid size-[18px] shrink-0 place-items-center rounded-[5px] border';
+    // Widens a small control's touch area to about 40px without changing how it looks.
+    $hitArea = 'relative before:absolute before:-inset-2.5';
 @endphp
 
 <div class="space-y-2.5">
-    <div class="flex items-center gap-2.5">
-        <span class="rounded-md bg-teal-600/10 dark:bg-teal-300/10 px-2.5 py-0.5 text-[13px] font-semibold text-teal-700 dark:text-teal-200">{{ __('Todos') }}</span>
+    <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+        <span class="shrink-0 rounded-md bg-teal-600/10 dark:bg-teal-300/10 px-2.5 py-0.5 text-[13px] font-semibold text-teal-700 dark:text-teal-200">{{ __('Todos') }}</span>
         <span class="text-[13px] text-zinc-500">{{ __('Check one off when it’s done') }}</span>
 
         @if ($this->openTodos->isNotEmpty())
@@ -19,7 +21,7 @@
                 <button
                     type="button"
                     wire:click="complete({{ $todo->id }})"
-                    class="{{ $checkbox }} cursor-pointer border-line-hover text-transparent transition-colors hover:border-accent hover:text-accent"
+                    class="{{ $checkbox }} {{ $hitArea }} cursor-pointer border-line-hover text-transparent transition-colors hover:border-accent hover:text-accent"
                     aria-label="{{ __('Check off :title', ['title' => $todo->title]) }}"
                 >
                     <flux:icon.check variant="micro" class="size-3.5" />
@@ -30,7 +32,7 @@
                 <button
                     type="button"
                     wire:click="delete({{ $todo->id }})"
-                    class="mt-[5px] shrink-0 cursor-pointer text-ink-faint opacity-0 transition-opacity group-hover:opacity-100 hover:text-red-600 dark:hover:text-red-300 focus:opacity-100"
+                    class="{{ $hitArea }} mt-[5px] shrink-0 cursor-pointer text-ink-faint opacity-0 transition-opacity group-hover:opacity-100 hover:text-red-600 focus:opacity-100 pointer-coarse:opacity-100 dark:hover:text-red-300"
                     aria-label="{{ __('Delete :title', ['title' => $todo->title]) }}"
                 >
                     <flux:icon.x-mark variant="micro" />

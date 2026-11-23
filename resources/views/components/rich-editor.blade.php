@@ -18,7 +18,7 @@
         ['command' => "run('toggleCode')", 'active' => 'code', 'icon' => 'code-bracket', 'label' => __('Code')],
     ];
 
-    $buttonClasses = 'grid size-8 cursor-pointer place-items-center rounded-lg text-ink-muted transition-colors hover:bg-hover hover:text-ink-strong';
+    $buttonClasses = 'grid size-9 shrink-0 cursor-pointer place-items-center rounded-lg text-ink-muted transition-colors hover:bg-hover hover:text-ink-strong sm:size-8';
 @endphp
 
 {{--
@@ -30,7 +30,8 @@
     x-data="richEditor({ property: @js($property), label: @js($label), autofocus: @js($autofocus) })"
     wire:ignore
 >
-    <div class="hidden items-center gap-0.5 border-b border-line px-2 py-1.5 group-focus-within:flex" role="toolbar" aria-label="{{ __('Formatting') }}">
+    {{-- Wraps onto a second row on a phone instead of squeezing the buttons. --}}
+    <div class="hidden flex-wrap items-center gap-0.5 border-b border-line px-2 py-1.5 group-focus-within:flex" role="toolbar" aria-label="{{ __('Formatting') }}">
         @foreach ($buttons as $button)
             @if ($button === null)
                 <span class="mx-1 h-5 w-px bg-raised" aria-hidden="true"></span>

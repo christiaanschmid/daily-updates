@@ -23,20 +23,20 @@
 
     <div>
         @forelse ($this->updates as $update)
-            <article wire:key="update-{{ $update->id }}" class="grid grid-cols-[56px_minmax(0,1fr)] gap-5">
+            <article wire:key="update-{{ $update->id }}" class="grid grid-cols-[44px_minmax(0,1fr)] gap-3 sm:grid-cols-[56px_minmax(0,1fr)] sm:gap-5">
                 <div class="flex flex-col items-center">
                     <a
                         href="{{ route('updates.show', $update->date->format('Y-m-d')) }}"
                         aria-label="{{ $update->date->format('l, F j, Y') }}"
                         @class([
-                            'flex w-13 flex-col items-center rounded-xl border py-1.5 leading-tight',
+                            'flex w-11 flex-col items-center rounded-xl border py-1.5 leading-tight sm:w-13',
                             'border-accent bg-accent text-accent-foreground' => $update->date->isToday(),
                             'border-line bg-surface text-ink hover:border-line-hover' => ! $update->date->isToday(),
                         ])
                         wire:navigate
                     >
                         <span @class(['font-mono text-[11px] uppercase', 'text-zinc-500' => ! $update->date->isToday()])>{{ $update->date->format('D') }}</span>
-                        <span class="text-xl font-semibold">{{ $update->date->format('j') }}</span>
+                        <span class="text-lg font-semibold sm:text-xl">{{ $update->date->format('j') }}</span>
                     </a>
 
                     <span class="mt-2 w-px grow bg-line" aria-hidden="true"></span>
@@ -44,7 +44,7 @@
 
                 <div class="min-w-0 space-y-3.5 pb-8">
                     <div class="flex min-h-7 items-center gap-2.5">
-                        <a href="{{ route('updates.show', $update->date->format('Y-m-d')) }}" class="text-[15px] font-semibold hover:text-ink-strong" wire:navigate>
+                        <a href="{{ route('updates.show', $update->date->format('Y-m-d')) }}" class="min-w-0 text-[15px] font-semibold hover:text-ink-strong" wire:navigate>
                             {{ $update->date->format($update->date->isCurrentYear() ? 'l, F j' : 'l, F j, Y') }}
                         </a>
 
@@ -52,7 +52,7 @@
 
                         <button
                             type="button"
-                            class="h-8 cursor-pointer rounded-lg px-2.5 text-sm text-ink-muted transition-colors hover:bg-hover hover:text-ink-strong"
+                            class="h-10 shrink-0 cursor-pointer rounded-lg px-2.5 text-sm sm:h-8 text-ink-muted transition-colors hover:bg-hover hover:text-ink-strong"
                             x-data="{ copied: false }"
                             x-on:click="navigator.clipboard.writeText(@js($update->toPlainText())); copied = true; setTimeout(() => copied = false, 2000)"
                         >

@@ -6,9 +6,9 @@
         'up_next' => ['chip' => 'bg-accent/15 text-section-up-next', 'hint' => __('What you plan to do next')],
     ];
 
-    $navButton = 'grid size-9 place-items-center rounded-full border border-line text-ink-muted transition-colors hover:border-line-hover hover:text-ink-strong';
-    $barButton = 'inline-flex h-9 cursor-pointer items-center gap-2 rounded-[10px] px-3 text-sm text-ink-soft transition-colors hover:bg-hover hover:text-ink-strong';
-    $barPrimary = 'inline-flex h-9 cursor-pointer items-center gap-2 rounded-[10px] bg-accent px-4 text-sm font-semibold text-accent-foreground transition-opacity hover:opacity-90';
+    $navButton = 'grid size-10 shrink-0 place-items-center rounded-full border border-line text-ink-muted transition-colors hover:border-line-hover hover:text-ink-strong sm:size-9';
+    $barButton = 'inline-flex h-10 cursor-pointer items-center gap-2 rounded-[10px] px-3 text-sm text-ink-soft transition-colors hover:bg-hover hover:text-ink-strong sm:h-9';
+    $barPrimary = 'inline-flex h-10 cursor-pointer items-center gap-2 rounded-[10px] bg-accent px-4 text-sm font-semibold text-accent-foreground transition-opacity hover:opacity-90 sm:h-9';
 @endphp
 
 {{-- On the web, picks up changes made elsewhere, such as in the Mac app. The Mac app hears about them when it syncs. --}}
@@ -38,13 +38,13 @@
             @endif
 
             @unless ($day->isToday())
-                <a href="{{ route('updates.show', today()->format('Y-m-d')) }}" class="ms-1 text-sm text-accent-content hover:underline" wire:navigate>
+                <a href="{{ route('updates.show', today()->format('Y-m-d')) }}" class="ms-1 inline-flex min-h-10 items-center text-sm sm:min-h-0 text-accent-content hover:underline" wire:navigate>
                     {{ __('Jump to today') }}
                 </a>
             @endunless
         </div>
 
-        <h1 class="text-4xl leading-tight font-semibold tracking-tight">
+        <h1 class="text-3xl leading-tight font-semibold tracking-tight sm:text-4xl">
             {{ $day->format($day->isCurrentYear() ? 'l, F j' : 'l, F j, Y') }}
         </h1>
 
@@ -95,8 +95,8 @@
             <div @class(['space-y-8', 'mt-8' => $day->isToday(), 'mt-9' => ! $day->isToday()])>
                 @foreach (\App\Models\DailyUpdate::SECTIONS as $section => $heading)
                     <div class="space-y-2.5" wire:key="section-{{ $section }}">
-                        <div class="flex items-center gap-2.5">
-                            <span class="rounded-md px-2.5 py-0.5 text-[13px] font-semibold {{ $sectionStyles[$section]['chip'] ?? '' }}">{{ __($heading) }}</span>
+                        <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+                            <span class="shrink-0 rounded-md px-2.5 py-0.5 text-[13px] font-semibold {{ $sectionStyles[$section]['chip'] ?? '' }}">{{ __($heading) }}</span>
                             <span class="text-[13px] text-zinc-500">{{ $sectionStyles[$section]['hint'] ?? '' }}</span>
                         </div>
 
@@ -114,8 +114,8 @@
                 @endif
             </div>
 
-            <div class="sticky bottom-0 flex justify-center pt-6 pb-6">
-                <div class="flex flex-wrap items-center gap-1 rounded-2xl border border-line bg-overlay p-1.5 shadow-[0_12px_32px_var(--color-shadow)]" data-action-bar>
+            <div class="sticky bottom-0 flex justify-center pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+                <div class="flex max-w-full flex-wrap items-center justify-center gap-1 rounded-2xl border border-line bg-overlay p-1.5 shadow-[0_12px_32px_var(--color-shadow)]" data-action-bar>
                     <span class="inline-flex items-center gap-1.5 px-2 text-[13px] text-ink-muted" wire:loading.remove wire:target="done,up_next">
                         <span class="size-1.5 rounded-full bg-teal-500 dark:bg-teal-300" aria-hidden="true"></span>
                         @if ($lastSavedAt)
@@ -165,8 +165,8 @@
             @endif
         </div>
 
-        <div class="sticky bottom-0 flex justify-center pt-6 pb-6">
-            <div class="flex flex-wrap items-center gap-1 rounded-2xl border border-line bg-overlay p-1.5 shadow-[0_12px_32px_var(--color-shadow)]" data-action-bar>
+        <div class="sticky bottom-0 flex justify-center pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+            <div class="flex max-w-full flex-wrap items-center justify-center gap-1 rounded-2xl border border-line bg-overlay p-1.5 shadow-[0_12px_32px_var(--color-shadow)]" data-action-bar>
                 <flux:modal.trigger name="confirm-update-deletion">
                     <button type="button" class="{{ $barButton }} text-ink-muted hover:text-red-600 dark:hover:text-red-300">
                         <flux:icon.trash variant="micro" />

@@ -20,7 +20,8 @@
                 Only its empty parts move the window. A button inside a dragging area can lose its clicks
                 to the window drag, so no button sits inside one.
             --}}
-            <header class="sticky top-0 z-30 border-b border-line bg-canvas/85 backdrop-blur-xl select-none">
+            {{-- The page scrolls in `.desktop-scroll` below, so the scrollbar starts under this toolbar. --}}
+            <header class="z-30 shrink-0 border-b border-line bg-canvas select-none">
                 {{-- Three columns, so the centered nav can never cover the buttons on the right, however narrow the window. --}}
                 <div class="grid h-13 grid-cols-[1fr_auto_1fr] items-center">
                     {{-- Starts after the window buttons, which macOS draws over this corner. --}}
@@ -61,19 +62,20 @@
             </header>
         @else
             <header class="border-b border-line">
-                <div class="mx-auto flex min-h-16 w-full max-w-5xl flex-wrap items-center gap-x-6 gap-y-2 px-6">
-                    <a href="{{ route('dashboard') }}" class="flex items-center gap-2.5" wire:navigate>
+                {{-- One row at every width: on a phone the name collapses to the logo so the nav fits beside it. --}}
+                <div class="mx-auto flex min-h-16 w-full max-w-5xl items-center gap-x-3 px-4 sm:gap-x-6 sm:px-6">
+                    <a href="{{ route('dashboard') }}" class="flex shrink-0 items-center gap-2.5" aria-label="{{ config('app.name', 'Daily Updates') }}" wire:navigate>
                         <x-app-logo-icon class="size-7" />
-                        <span class="text-[15px] font-semibold">{{ config('app.name', 'Daily Updates') }}</span>
+                        <span class="text-[15px] font-semibold max-sm:hidden">{{ config('app.name', 'Daily Updates') }}</span>
                     </a>
 
-                    <nav aria-label="{{ __('Main') }}" class="flex gap-1">
+                    <nav aria-label="{{ __('Main') }}" class="flex min-w-0 gap-0.5 sm:gap-1">
                         @foreach ($navItems as $item)
                             <a
                                 href="{{ $item['href'] }}"
                                 @if ($item['current']) aria-current="page" @endif
                                 @class([
-                                    'flex h-9 items-center rounded-full px-3 text-sm transition-colors',
+                                    'flex h-10 items-center rounded-full px-3 text-sm transition-colors sm:h-9',
                                     'bg-raised font-medium text-ink-strong' => $item['current'],
                                     'text-ink-muted hover:text-ink-strong' => ! $item['current'],
                                 ])
@@ -86,12 +88,18 @@
 
                     <span class="grow"></span>
 
-                    <x-desktop-user-menu />
+                    <x-desktop-user-menu class="shrink-0" />
                 </div>
             </header>
         @enddesktop
 
-        {{ $slot }}
+        @desktop
+            <div class="desktop-scroll">
+                {{ $slot }}
+            </div>
+        @else
+            {{ $slot }}
+        @enddesktop
 
         @persist('toast')
             <flux:toast />

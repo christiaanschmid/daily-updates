@@ -28,7 +28,8 @@
                         {{ __('Log in') }}
                     </a>
                     @if (Route::has('register'))
-                        <a href="{{ route('register') }}" class="inline-flex min-h-11 items-center rounded-lg bg-accent px-4.5 text-[15px] font-medium text-accent-foreground hover:opacity-90">
+                        {{-- On a phone the hero's own button stands in for this one, so the header stays one row. --}}
+                        <a href="{{ route('register') }}" class="inline-flex min-h-11 items-center rounded-lg bg-accent max-sm:hidden px-4.5 text-[15px] font-medium text-accent-foreground hover:opacity-90">
                             {{ __('Get started') }}
                         </a>
                     @endif

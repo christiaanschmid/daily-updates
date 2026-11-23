@@ -3,8 +3,8 @@
 @endphp
 
 <div class="space-y-2.5">
-    <div class="flex items-center gap-2.5">
-        <span class="rounded-md bg-teal-600/10 dark:bg-teal-300/10 px-2.5 py-0.5 text-[13px] font-semibold text-teal-700 dark:text-teal-200">{{ __(\App\Models\DailyUpdate::COMPLETED_TODOS_HEADING) }}</span>
+    <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+        <span class="shrink-0 rounded-md bg-teal-600/10 dark:bg-teal-300/10 px-2.5 py-0.5 text-[13px] font-semibold text-teal-700 dark:text-teal-200">{{ __(\App\Models\DailyUpdate::COMPLETED_TODOS_HEADING) }}</span>
 
         @if ($isToday)
             <span class="text-[13px] text-zinc-500">{{ __('Uncheck one to put it back on your list') }}</span>
@@ -21,7 +21,7 @@
                         <button
                             type="button"
                             wire:click="reopen({{ $todo->id }})"
-                            class="mt-[5px] grid size-[18px] shrink-0 cursor-pointer place-items-center rounded-[5px] border border-accent bg-accent text-accent-foreground transition-opacity hover:opacity-80"
+                            class="relative mt-[5px] grid size-[18px] shrink-0 cursor-pointer place-items-center before:absolute before:-inset-2.5 rounded-[5px] border border-accent bg-accent text-accent-foreground transition-opacity hover:opacity-80"
                             aria-label="{{ __('Reopen :title', ['title' => $todo->title]) }}"
                         >
                             <flux:icon.check variant="micro" class="size-3.5" />

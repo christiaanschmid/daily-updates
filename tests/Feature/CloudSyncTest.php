@@ -147,7 +147,6 @@ test('the approval page needs a signed-in account', function () {
     $this->get(route('desktop.connect', $connection->code))->assertRedirect(route('login'));
 });
 
-
 // --- Sync: the hosted side -------------------------------------------------
 
 test('finishing gives the Mac a token to sync with, once', function () {

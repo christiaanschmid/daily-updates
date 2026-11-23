@@ -81,6 +81,7 @@ if ! $foreground && ! $background_child; then
     echo "Release started in the background (process $!)."
     echo "Follow it with:"
     echo "  tail -f \"$PWD/$log\""
+    echo "Check on it any time with: composer desktop:release-status"
     echo "You'll get a notification when it finishes or fails."
     exit 0
 fi
